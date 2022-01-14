@@ -1,14 +1,25 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="System.CommandLine" Version="2.0.0-beta2.21617.1" />
-  </ItemGroup>
+	<!-- todo: maybe will be better to create a publish profile -->
+	<!-- MS Build config for publish single file for Linux (dotnet publish -p:linux=true) -->
+	<PropertyGroup Condition="'$(Linux)' == true">
+		<PublishSingleFile>true</PublishSingleFile>
+		<RuntimeIdentifier>linux-x64</RuntimeIdentifier>
+		<PublishTrimmed>true</PublishTrimmed>
+		<AssemblyName>green-cobra</AssemblyName>
+		<!--this shit doesn't work <Configuration>Release</Configuration>-->
+		<PublishDir>.\bin\Publish\$(RuntimeIdentifier)</PublishDir>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="System.CommandLine" Version="2.0.0-beta2.21617.1" />
+	</ItemGroup>
 
 </Project>

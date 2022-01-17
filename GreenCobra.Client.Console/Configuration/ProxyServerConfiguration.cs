@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Text.Json.Serialization;
 
-namespace GreenCobra.Client.Console
+namespace GreenCobra.Client.Console.Configuration
 {
     public sealed class ProxyServerConfiguration
     {

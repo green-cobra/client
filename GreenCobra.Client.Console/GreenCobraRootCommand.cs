@@ -2,6 +2,8 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Net.Sockets;
+using GreenCobra.Client.Console.Configuration;
+using GreenCobra.Client.Console.ProxyStream;
 
 namespace GreenCobra.Client.Console;
 

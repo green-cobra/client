@@ -2,7 +2,7 @@
 using System.Net;
 using System.Net.Sockets;
 
-namespace GreenCobra.Client.Console;
+namespace GreenCobra.Client.Console.ProxyStream;
 
 public class ProxyStream : IDisposable
 {

@@ -2,10 +2,10 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Net.Sockets;
-using GreenCobra.Client.Console.Configuration;
-using GreenCobra.Client.Console.ProxyStream;
+using GreenCobra.ConsoleClient.Configuration;
+using GreenCobra.ConsoleClient.ProxyStream;
 
-namespace GreenCobra.Client.Console;
+namespace GreenCobra.ConsoleClient;
 
 public class GreenCobraRootCommand : RootCommand
 {
@@ -48,8 +48,8 @@ public class GreenCobraRootCommand : RootCommand
                 var proxyServerConfig = await GetProxyServerConfigurationAsync(remoteUrl, remoteDomainRequest);
 
                 // log to console
-                System.Console.WriteLine(localEndPoint.ToString());
-                System.Console.WriteLine(proxyServerConfig.ToString());
+                Console.WriteLine(localEndPoint.ToString());
+                Console.WriteLine(proxyServerConfig.ToString());
 
                 var proxyManager = new ProxyStreamManager(proxyServerConfig, localEndPoint);
 

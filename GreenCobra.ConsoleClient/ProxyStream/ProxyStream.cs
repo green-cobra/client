@@ -2,7 +2,7 @@
 using System.Net;
 using System.Net.Sockets;
 
-namespace GreenCobra.Client.Console.ProxyStream;
+namespace GreenCobra.ConsoleClient.ProxyStream;
 
 public class ProxyStream : IDisposable
 {
@@ -36,7 +36,7 @@ public class ProxyStream : IDisposable
         }
         catch (Exception e)
         {
-            System.Console.WriteLine(e);
+            Console.WriteLine(e);
             throw;
         }
         finally

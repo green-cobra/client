@@ -1,4 +1,4 @@
-﻿namespace GreenCobra.Client.Console.ProxyStream;
+﻿namespace GreenCobra.ConsoleClient.ProxyStream;
 
 public enum ProxyStreamType
 {

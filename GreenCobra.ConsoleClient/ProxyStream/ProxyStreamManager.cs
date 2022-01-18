@@ -1,7 +1,7 @@
 ﻿using System.Net;
-using GreenCobra.Client.Console.Configuration;
+using GreenCobra.ConsoleClient.Configuration;
 
-namespace GreenCobra.Client.Console.ProxyStream;
+namespace GreenCobra.ConsoleClient.ProxyStream;
 
 public class ProxyStreamManager
 {
@@ -31,7 +31,7 @@ public class ProxyStreamManager
                 //.ContinueWith((result => _activeProxyTasks.Remove(result));
             _activeProxyTasks.Add(proxyTask);
 
-            System.Console.WriteLine($"Task Created {proxyTask.Id}");
+            Console.WriteLine($"Task Created {proxyTask.Id}");
         }
 
         while (true) // while (cancellationToken)
@@ -40,23 +40,23 @@ public class ProxyStreamManager
             so we need to check was task completed with success or failure */
             var completedTask = await Task.WhenAny(_activeProxyTasks);
 
-            System.Console.WriteLine($"Task Completed {completedTask.Id}");
+            Console.WriteLine($"Task Completed {completedTask.Id}");
 
             _activeProxyTasks.Remove(completedTask);
             var proxyTask = StartProxyAsync();
             _activeProxyTasks.Add(proxyTask);
 
-            System.Console.WriteLine($"  -  Task Created {proxyTask.Id}");
+            Console.WriteLine($"  -  Task Created {proxyTask.Id}");
         }
     }
 
     private async Task StartProxyAsync()
     {
-        using var remoteProxyStream = new Console.ProxyStream.ProxyStream(_serverProxyEndPoint, ProxyStreamType.Remote);
-        using var localProxyStream = new Console.ProxyStream.ProxyStream(_localEndPoint, ProxyStreamType.Local);
+        using var remoteProxyStream = new ProxyStream(_serverProxyEndPoint);
+        using var localProxyStream = new ProxyStream(_localEndPoint);
 
-        System.Console.WriteLine($"    -  New Remote Connection {remoteProxyStream.Id}");
-        System.Console.WriteLine($"    -  New Local Connection {localProxyStream.Id}");
+        Console.WriteLine($"    -  New Remote Connection {remoteProxyStream.Id}");
+        Console.WriteLine($"    -  New Local Connection {localProxyStream.Id}");
 
         var remoteProxyTask = remoteProxyStream.CopyAsync(localProxyStream);
         var localProxyTask = localProxyStream.CopyAsync(remoteProxyStream);

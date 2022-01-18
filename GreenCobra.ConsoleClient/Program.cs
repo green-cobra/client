@@ -1,5 +1,5 @@
 ﻿using System.CommandLine;
-using GreenCobra.Client.Console;
+using GreenCobra.ConsoleClient;
 
 //var debugParams = $"green-cobra --local-port 57678";
 

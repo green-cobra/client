@@ -6,23 +6,21 @@ namespace GreenCobra.Client.Console.ProxyStream;
 
 public class ProxyStream : IDisposable
 {
-    public Socket _socket;
-    //private IPEndPoint _endPoint;
     public Guid Id = Guid.NewGuid();
+    
+    private readonly Socket _socket;
+    private readonly IPEndPoint _endPoint;
 
-    public ProxyStreamType Type;
-
-    public ProxyStream(IPEndPoint endPoint, ProxyStreamType type)
+    public ProxyStream(IPEndPoint endPoint)
     {
-        Type = type;
-        //_endPoint = endPoint;
-
+        _endPoint = endPoint;
         _socket = new(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-        _socket.Connect(endPoint); // todo: Move to Connect()
     }
 
     public async Task CopyAsync(ProxyStream destination)
     {
+        await ConnectIfNotConnected();
+
         int bufferSize = 64 * 1024;
         byte[] buffer = ArrayPool<byte>.Shared.Rent(bufferSize);
 
@@ -38,7 +36,7 @@ public class ProxyStream : IDisposable
         }
         catch (Exception e)
         {
-            LogException(e);
+            System.Console.WriteLine(e);
             throw;
         }
         finally
@@ -47,8 +45,16 @@ public class ProxyStream : IDisposable
         }
     }
 
+    private async Task ConnectIfNotConnected()
+    {
+        if (!_socket.Connected)
+            await _socket.ConnectAsync(_endPoint);
+    }
+
     public async Task<int> WriteAsync(byte[] buffer)
     {
+        await ConnectIfNotConnected();
+
         var sendCount = await _socket.SendAsync(buffer, SocketFlags.None);
 
         return sendCount;
@@ -56,22 +62,18 @@ public class ProxyStream : IDisposable
 
     public async Task<int> ReadAsync(byte[] buffer)
     {
+        await ConnectIfNotConnected();
+
         var receivedCount = await _socket.ReceiveAsync(buffer, SocketFlags.None);
 
         return receivedCount;
     }
 
-    private void LogException(Exception e)
-    {
-        //$"{Type}:".WriteInfoLine();
-        System.Console.WriteLine(e);
-    }
-
-    public void LogCopyToConsole(ProxyStream destination, byte[] data)
-    {
-        //$"{Type} --> {destination.Type}".WriteInfoLine();
-        //Encoding.UTF8.GetString(data).WriteSuccessLine();
-    }
+    //public void LogCopyToConsole(ProxyStream destination, byte[] data)
+    //{
+    //    //$"{Type} --> {destination.Type}".WriteInfoLine();
+    //    //Encoding.UTF8.GetString(data).WriteSuccessLine();
+    //}
 
     public void Dispose()
     {

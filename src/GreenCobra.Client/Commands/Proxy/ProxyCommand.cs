@@ -2,9 +2,9 @@
 using System.CommandLine.Binding;
 using System.CommandLine.Invocation;
 using System.Net;
-using GreenCobra.Client.Console.Commands.Proxy.Handlers;
+using GreenCobra.Client.Commands.Proxy.Handlers;
 
-namespace GreenCobra.Client.Console.Commands.Proxy;
+namespace GreenCobra.Client.Commands.Proxy;
 
 public class ProxyCommand : Command
 {

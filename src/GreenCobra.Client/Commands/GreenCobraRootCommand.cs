@@ -1,7 +1,7 @@
 ﻿using System.CommandLine;
-using GreenCobra.Client.Console.Commands.Proxy;
+using GreenCobra.Client.Commands.Proxy;
 
-namespace GreenCobra.Client.Console.Commands;
+namespace GreenCobra.Client.Commands;
 
 public class GreenCobraRootCommand : RootCommand
 {

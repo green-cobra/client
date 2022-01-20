@@ -1,5 +1,5 @@
 ﻿using System.CommandLine;
-using GreenCobra.Client.Console.Commands;
+using GreenCobra.Client.Commands;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
 

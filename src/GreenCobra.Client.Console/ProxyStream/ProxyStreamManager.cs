@@ -1,7 +1,7 @@
 ﻿using System.Net;
-using GreenCobra.ConsoleClient.Configuration;
+using GreenCobra.Client.Console.Configuration;
 
-namespace GreenCobra.ConsoleClient.ProxyStream;
+namespace GreenCobra.Client.Console.ProxyStream;
 
 public class ProxyStreamManager
 {
@@ -22,8 +22,8 @@ public class ProxyStreamManager
             using var remoteProxyStream = new ProxyStream(localEndPoint, ProxyStreamType.Remote);
             using var localProxyStream = new ProxyStream(serverConfiguration.IpEndPoint, ProxyStreamType.Local);
 
-            Console.WriteLine($"    -  New Remote Connection {remoteProxyStream.Id}");
-            Console.WriteLine($"    -  New Local Connection {localProxyStream.Id}");
+            System.Console.WriteLine($"    -  New Remote Connection {remoteProxyStream.Id}");
+            System.Console.WriteLine($"    -  New Local Connection {localProxyStream.Id}");
 
             var remoteProxyTask = remoteProxyStream.CopyAsync(localProxyStream);
             var localProxyTask = localProxyStream.CopyAsync(remoteProxyStream);

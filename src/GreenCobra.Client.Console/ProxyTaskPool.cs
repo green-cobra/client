@@ -1,4 +1,4 @@
-﻿namespace GreenCobra.ConsoleClient;
+﻿namespace GreenCobra.Client.Console;
 
 public class ProxyTaskPool
 {
@@ -44,9 +44,9 @@ public class ProxyTaskPool
     {
         while (true)
         {
-            Console.ForegroundColor = ConsoleColor.Blue;
-            Console.WriteLine($"Actively running at pool:{ProxyTasks.Count}");
-            Console.ResetColor();
+            System.Console.ForegroundColor = ConsoleColor.Blue;
+            System.Console.WriteLine($"Actively running at pool:{ProxyTasks.Count}");
+            System.Console.ResetColor();
 
             Thread.Sleep(TimeSpan.FromSeconds(5));
         }

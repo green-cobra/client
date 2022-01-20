@@ -2,17 +2,9 @@
 using System.CommandLine.Binding;
 using System.CommandLine.Invocation;
 using System.Net;
-using GreenCobra.ConsoleClient.Commands.Handlers;
+using GreenCobra.Client.Console.Commands.Proxy.Handlers;
 
-namespace GreenCobra.ConsoleClient.Commands;
-
-public class GreenCobraRootCommand : RootCommand
-{
-    public GreenCobraRootCommand()
-    {
-        AddCommand(new ProxyCommand());
-    }
-}
+namespace GreenCobra.Client.Console.Commands.Proxy;
 
 public class ProxyCommand : Command
 {
@@ -99,5 +91,3 @@ public class ProxyCommand : Command
         }
     }
 }
-
-public record ProxyParams(IPEndPoint LocalServerEndPoint, Uri RemoteServerUrl, string RemoteDomainRequest);

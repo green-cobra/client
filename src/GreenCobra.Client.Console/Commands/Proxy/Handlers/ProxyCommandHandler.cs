@@ -3,15 +3,13 @@ using System.CommandLine.Invocation;
 using System.Net;
 using System.Net.Http.Json;
 using System.Net.Sockets;
-using GreenCobra.ConsoleClient.Configuration;
-using GreenCobra.ConsoleClient.ProxyStream;
+using GreenCobra.Client.Console.Configuration;
+using GreenCobra.Client.Console.ProxyStream;
 
-namespace GreenCobra.ConsoleClient.Commands.Handlers;
+namespace GreenCobra.Client.Console.Commands.Proxy.Handlers;
 
 public class ProxyCommandHandler : ICommandHandler
 {
-    // Func<InvocationContext, Task>
-
     private ProxyParams _proxyParams;
     private BinderBase<ProxyParams> _binder;
     private CancellationToken _cancellationToken;
@@ -28,7 +26,7 @@ public class ProxyCommandHandler : ICommandHandler
         //_binder.TryGetValue(_binder, context.BindingContext)
 
 
-        Console.WriteLine();
+        System.Console.WriteLine();
 
         //context.BindingContext.ParseResult.
         //    //.GetValueForOption()
@@ -66,8 +64,8 @@ public class ProxyCommandHandler : ICommandHandler
             using var remoteProxyStream = new ProxyStream.ProxyStream(localEndPoint, ProxyStreamType.Remote);
             using var localProxyStream = new ProxyStream.ProxyStream(serverConfiguration.IpEndPoint, ProxyStreamType.Local);
 
-            Console.WriteLine($"    -  New Remote Connection {remoteProxyStream.Id}");
-            Console.WriteLine($"    -  New Local Connection {localProxyStream.Id}");
+            System.Console.WriteLine($"    -  New Remote Connection {remoteProxyStream.Id}");
+            System.Console.WriteLine($"    -  New Local Connection {localProxyStream.Id}");
 
             var remoteProxyTask = remoteProxyStream.CopyAsync(localProxyStream);
             var localProxyTask = localProxyStream.CopyAsync(remoteProxyStream);

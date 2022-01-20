@@ -3,7 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
-namespace GreenCobra.ConsoleClient.ProxyStream;
+namespace GreenCobra.Client.Console.ProxyStream;
 
 public class ProxyStream : IDisposable
 {
@@ -39,7 +39,7 @@ public class ProxyStream : IDisposable
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            System.Console.WriteLine(e);
             throw;
         }
         finally
@@ -76,16 +76,16 @@ public class ProxyStream : IDisposable
     {
         var delimiter = new string('-', 50);
 
-        Console.WriteLine();
-        Console.WriteLine(delimiter);
-        Console.WriteLine($"Data length: {data.Length}");
-        Console.WriteLine(delimiter);
+        System.Console.WriteLine();
+        System.Console.WriteLine(delimiter);
+        System.Console.WriteLine($"Data length: {data.Length}");
+        System.Console.WriteLine(delimiter);
 
         var str = Encoding.UTF8.GetString(data);
         var segment = str.Split("\r\n\r\n");
 
-        Console.WriteLine(segment[0]);
-        Console.WriteLine(delimiter);
+        System.Console.WriteLine(segment[0]);
+        System.Console.WriteLine(delimiter);
     }
 
     public void Dispose()

@@ -3,7 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
-namespace GreenCobra.Client.ProxyStream;
+namespace GreenCobra.Client.Proxy;
 
 public class ProxyStream : IDisposable
 {

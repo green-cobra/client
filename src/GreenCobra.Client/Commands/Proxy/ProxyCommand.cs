@@ -2,6 +2,7 @@
 using System.CommandLine.Binding;
 using System.CommandLine.Invocation;
 using System.Net;
+using GreenCobra.Client.Commands.Proxy.Configuration;
 using GreenCobra.Client.Commands.Proxy.Handlers;
 
 namespace GreenCobra.Client.Commands.Proxy;
@@ -53,7 +54,7 @@ public class ProxyCommand : Command
         var proxyParamsBinder = new ProxyParamsBinder();
 
         this.SetHandler(
-            async (ProxyParams @params,
+            async (ProxyCommandParams @params,
                 InvocationContext ctx,
                 CancellationToken cancellationToken) =>
             {
@@ -72,16 +73,16 @@ public class ProxyCommand : Command
         AddOption(RemoteDomainOption);
     }
 
-    private class ProxyParamsBinder : BinderBase<ProxyParams>
+    private class ProxyParamsBinder : BinderBase<ProxyCommandParams>
     {
-        protected override ProxyParams GetBoundValue(BindingContext bindingContext)
+        protected override ProxyCommandParams GetBoundValue(BindingContext bindingContext)
         {
             T? GetOptionValue<T>(Option<T> option) => bindingContext.ParseResult.GetValueForOption(option);
 
             var localServerPort = GetOptionValue(LocalPortOption);
             var localServeHost = GetOptionValue(LocalHostOption);
 
-            return new ProxyParams(
+            return new ProxyCommandParams(
                 IPEndPoint.Parse($"{localServeHost}:{localServerPort}"),
                 GetOptionValue(RemoteUrlOption) ??
                 throw new ArgumentException(

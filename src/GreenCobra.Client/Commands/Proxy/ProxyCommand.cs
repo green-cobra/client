@@ -60,7 +60,6 @@ public class ProxyCommand : Command
             {
                 var handler = new ProxyCommandHandler(proxyParams, cancellationToken);
 
-
                 await handler.InvokeAsync(ctx);
             },
             proxyParamsBinder);
@@ -86,9 +85,8 @@ public class ProxyCommand : Command
 
             return new ProxyCommandParams(
                 IPEndPoint.Parse($"{localServeHost}:{localServerPort}"),
-                GetOptionValue(RemoteUrlOption) ??
-                throw new ArgumentException(
-                    "Invalid remote server url was provided"), // todo: maybe this param will be not configurable
+                GetOptionValue(RemoteUrlOption) 
+                    ?? throw new ArgumentException("Invalid remote server url was provided"), // todo: maybe this param will be not configurable
                 GetOptionValue(RemoteDomainOption) ?? RemoteDomainDefault
             );
         }

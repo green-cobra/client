@@ -46,32 +46,22 @@ public class ProxyTaskPool
 
     private void StartNewProxyTask(CancellationToken cancellationToken)
     {
-        var proxyTask = Task.Run(_proxyFunc(_proxyConfiguration), cancellationToken);
-        ProxyTasks.Add(proxyTask);
-    }
-
-    private Func<Task> _proxyFunc(ProxyConfiguration proxyConfiguration) =>
-        async () =>
+        var proxyTask = Task.Run(async () =>
         {
             var state = new ProxyTaskState(Task.CurrentId.Value);
             using var scope = _logger.BeginScope(state);
             _logger.LogDebug($"Proxy task started, id {state.Id}");
 
-            using var remoteProxyStream = 
-                new ProxyStream(proxyConfiguration.ServerEndPoint, ProxyStreamType.Remote);
-            using var localProxyStream = 
-                new ProxyStream(proxyConfiguration.LocalApplicationEndPoint, ProxyStreamType.Local);
+            var connection = new ProxyConnection(_proxyConfiguration.ServerEndPoint,
+                _proxyConfiguration.LocalApplicationEndPoint);
 
-            _logger.LogDebug($"Remote connection id: {remoteProxyStream.Id}\r\n;" +
-                             $"Local connection id {localProxyStream.Id}");
+            _logger.LogDebug($"Proxy connection initialized; conn_id {connection.Id}");
 
-            var remoteProxyTask = remoteProxyStream.CopyAsync(localProxyStream);
-            var localProxyTask = localProxyStream.CopyAsync(remoteProxyStream);
-
-            await Task.WhenAll(remoteProxyTask, localProxyTask);
-
-            _logger.LogDebug($"Connection pair {remoteProxyStream.Id} - {localProxyTask.Id} completed");
-        };
+            await connection.ProxyAsync();
+        }, cancellationToken);
+        
+        ProxyTasks.Add(proxyTask);
+    }
 
     private Action _watcherAction(CancellationToken ct) =>
         () =>

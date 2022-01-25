@@ -16,7 +16,7 @@ public class CommandLoggerFactory : IDisposable
         LoggerFactoryInstance = LoggerFactory.Create(builder =>
         {
             builder
-                .AddJsonConsole()
+                //.AddJsonConsole()
                 .AddSimpleConsole(options =>
                 {
                     options.IncludeScopes = true;

@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Net.Sockets;
 using GreenCobra.Client.Commands.Proxy.Configuration;
+using GreenCobra.Client.ConsoleUI;
 using GreenCobra.Client.Logging;
 using GreenCobra.Client.Proxy;
 using Microsoft.Extensions.Logging;
@@ -30,15 +31,13 @@ public class ProxyCommandHandler : ICommandHandler
         // init step - retrieving configs
         var proxyConnectionConfig = await GetProxyServerConfigurationAsync();
 
-        // todo: UI output
-        //Console.WriteLine(proxyConnectionConfig.ToString());
-
         var proxyServerEndPoint = await ResolveProxyServerEndPointAsync(proxyConnectionConfig);
         var proxyConfig = new ProxyConfiguration(
             proxyServerEndPoint,
             _proxyParams.LocalServerEndPoint,
             proxyConnectionConfig.MaxConnections);
 
+        Dashboard.DisplayProxyConnectionConfiguration(proxyConnectionConfig);
         _logger.LogDebug($"Proxy server {proxyServerEndPoint}");
 
         // init Task pool

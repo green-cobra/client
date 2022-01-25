@@ -3,32 +3,43 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Net.Sockets;
 using GreenCobra.Client.Commands.Proxy.Configuration;
+using GreenCobra.Client.Logging;
 using GreenCobra.Client.Proxy;
+using Microsoft.Extensions.Logging;
 
 namespace GreenCobra.Client.Commands.Proxy.Handlers;
 
-public partial class ProxyCommandHandler : ICommandHandler
+public class ProxyCommandHandler : ICommandHandler
 {
     private readonly ProxyCommandParams _proxyParams;
     private readonly CancellationToken _cancellationToken;
 
+    private readonly ILogger<ProxyCommandHandler> _logger;
+    
     public ProxyCommandHandler(ProxyCommandParams proxyParams, CancellationToken cancellationToken)
     {
         _proxyParams = proxyParams;
         _cancellationToken = cancellationToken;
+
+        _logger = CommandLoggerFactory.GetLogger<ProxyCommandHandler>();
+        _logger.LogDebug($"{_proxyParams}");
     }
 
     public async Task<int> InvokeAsync(InvocationContext context)
     {
         // init step - retrieving configs
-        var proxyServerConfig = await GetProxyServerConfigurationAsync();
+        var proxyConnectionConfig = await GetProxyServerConfigurationAsync();
 
-        Console.WriteLine(proxyServerConfig.ToString());
+        // todo: UI output
+        //Console.WriteLine(proxyConnectionConfig.ToString());
 
+        var proxyServerEndPoint = await ResolveProxyServerEndPointAsync(proxyConnectionConfig);
         var proxyConfig = new ProxyConfiguration(
-            await ResolveProxyServerEndPointAsync(proxyServerConfig),
+            proxyServerEndPoint,
             _proxyParams.LocalServerEndPoint,
-            proxyServerConfig.MaxConnections);
+            proxyConnectionConfig.MaxConnections);
+
+        _logger.LogDebug($"Proxy server {proxyServerEndPoint}");
 
         // init Task pool
         var taskPool = new ProxyTaskPool(proxyConfig);
@@ -48,14 +59,16 @@ public partial class ProxyCommandHandler : ICommandHandler
 
         response.EnsureSuccessStatusCode();
 
-        var proxyServerConfig = await response.Content.ReadFromJsonAsync<ProxyConnectionConfiguration>(
+        var proxyConnectionConfig = await response.Content.ReadFromJsonAsync<ProxyConnectionConfiguration>(
                 cancellationToken: _cancellationToken);
 
         // todo: update exception
-        if (proxyServerConfig is null)
+        if (proxyConnectionConfig is null)
             throw new ArgumentNullException();
 
-        return proxyServerConfig;
+        _logger.LogDebug($"{proxyConnectionConfig}");
+
+        return proxyConnectionConfig;
     }
 
     private async Task<IPEndPoint> ResolveProxyServerEndPointAsync(ProxyConnectionConfiguration connectionConfig)
@@ -63,7 +76,7 @@ public partial class ProxyCommandHandler : ICommandHandler
         var ipAddress = (await Dns.GetHostAddressesAsync(
                 connectionConfig.ServerUrl.DnsSafeHost, AddressFamily.InterNetwork, _cancellationToken))
             .First();
-
+        
         return new IPEndPoint(ipAddress, connectionConfig.ServerPort);
     }
 }

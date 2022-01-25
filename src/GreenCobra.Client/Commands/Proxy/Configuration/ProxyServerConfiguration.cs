@@ -6,12 +6,4 @@ public record ProxyConnectionConfiguration(
     [property: JsonPropertyName("id")] string Domain,
     [property: JsonPropertyName("max_conn_count")] int MaxConnections,
     [property: JsonPropertyName("port")] int ServerPort,
-    [property: JsonPropertyName("url")] Uri ServerUrl)
-{
-    public override string ToString()
-    {
-        return $"Proxy Connection Info: \r\n" +
-               $"{nameof(Domain)}: {Domain}; {nameof(MaxConnections)}: {MaxConnections}; " +
-               $"{nameof(ServerUrl)}: {ServerUrl}; {nameof(ServerPort)}: {ServerPort};";
-    }
-}
+    [property: JsonPropertyName("url")] Uri ServerUrl);

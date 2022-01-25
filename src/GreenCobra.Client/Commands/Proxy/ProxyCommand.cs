@@ -54,11 +54,13 @@ public class ProxyCommand : Command
         var proxyParamsBinder = new ProxyParamsBinder();
 
         this.SetHandler(
-            async (ProxyCommandParams @params,
+            async (ProxyCommandParams proxyParams,
                 InvocationContext ctx,
                 CancellationToken cancellationToken) =>
             {
-                var handler = new ProxyCommandHandler(@params, cancellationToken);
+                var handler = new ProxyCommandHandler(proxyParams, cancellationToken);
+
+
                 await handler.InvokeAsync(ctx);
             },
             proxyParamsBinder);

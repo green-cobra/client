@@ -1,28 +1,25 @@
 ﻿namespace GreenCobra.Client.Commands.Proxy.Handlers;
 
-public partial class ProxyCommandHandler
+public class RetryHttpHandler : DelegatingHandler
 {
-    public class RetryHttpHandler : DelegatingHandler
+    // todo: put to config
+    private readonly int _maxRetries = 3;
+
+    public RetryHttpHandler() : base(new HttpClientHandler()) { }
+
+    protected override async Task<HttpResponseMessage> SendAsync(
+        HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        // todo: put to config
-        private readonly int _maxRetries = 3;
+        var response = await base.SendAsync(request, cancellationToken);
 
-        public RetryHttpHandler(): base(new HttpClientHandler()) { }
-
-        protected override async Task<HttpResponseMessage> SendAsync(
-            HttpRequestMessage request, CancellationToken cancellationToken)
+        for (int i = 0; i < _maxRetries; i++)
         {
-            var response = await base.SendAsync(request, cancellationToken);
+            if (response.IsSuccessStatusCode)
+                return response;
 
-            for (int i = 0; i < _maxRetries; i++)
-            {
-                if (response.IsSuccessStatusCode)
-                    return response;
-
-                // todo: add logic for some status codes e.g. Network connection failed
-            }
-
-            return response;
+            // todo: add logic for some status codes e.g. Network connection failed
         }
+
+        return response;
     }
 }

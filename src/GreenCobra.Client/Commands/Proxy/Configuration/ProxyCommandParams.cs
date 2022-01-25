@@ -2,4 +2,7 @@
 
 namespace GreenCobra.Client.Commands.Proxy.Configuration;
 
-public record ProxyCommandParams(IPEndPoint LocalServerEndPoint, Uri RemoteServerUrl, string RemoteDomainRequest);
+public record ProxyCommandParams(
+    IPEndPoint LocalServerEndPoint,
+    Uri RemoteServerUrl,
+    string RemoteDomainRequest);

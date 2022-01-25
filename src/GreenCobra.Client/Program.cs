@@ -1,6 +1,5 @@
 ﻿using System.CommandLine;
 using GreenCobra.Client.Commands;
-using Microsoft.Extensions.Logging;
 var debugParams = $"green-cobra proxy " +
                   $"--remote-domain-request green-cobra-7476 " +
                   $"--local-port 57679 ";

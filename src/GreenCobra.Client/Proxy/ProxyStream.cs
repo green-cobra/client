@@ -14,8 +14,9 @@ public class ProxyStream : IDisposable
 
     public ProxyStream(IPEndPoint endPoint, IProxyLogger logger)
     {
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
         _endPoint = endPoint;
-        _logger = logger;
         _socket = new(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
     }
 

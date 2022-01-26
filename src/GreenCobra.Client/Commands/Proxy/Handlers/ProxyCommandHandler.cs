@@ -20,9 +20,9 @@ public class ProxyCommandHandler : IProxyCommandHandler
         IProxyTaskPool proxyTaskPool,
         ILogger<ProxyCommandHandler> logger)
     {
-        _paramsBinder = paramsBinder;
-        _proxyTaskPool = proxyTaskPool;
-        _logger = logger;
+        _paramsBinder = paramsBinder ?? throw new ArgumentNullException(nameof(paramsBinder));
+        _proxyTaskPool = proxyTaskPool ?? throw new ArgumentNullException(nameof(proxyTaskPool));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public async Task<int> InvokeAsync(InvocationContext context)

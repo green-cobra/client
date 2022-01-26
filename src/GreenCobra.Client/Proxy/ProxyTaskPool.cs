@@ -10,7 +10,7 @@ public class ProxyTaskPool : IProxyTaskPool
 
     public ProxyTaskPool(ILogger<ProxyTaskPool> logger)
     {
-        _logger = logger;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public async Task RunAsync(ProxyConfiguration proxyConfiguration, CancellationToken cancellationToken)

@@ -1,14 +1,10 @@
 ﻿using System.CommandLine;
 using System.CommandLine.Binding;
-using System.CommandLine.Invocation;
 using System.Net;
 using GreenCobra.Client.Commands.Proxy.Configuration;
 using GreenCobra.Client.Commands.Proxy.Handlers;
-using GreenCobra.Client.Helpers;
-using GreenCobra.Client.Proxy;
+using GreenCobra.Client.Commands.Proxy.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Console;
 
 namespace GreenCobra.Client.Commands.Proxy;
 
@@ -51,60 +47,12 @@ public class ProxyCommand : Command
 
     #endregion
 
-    public ProxyCommand()
-        :base(Name, Description)
+    public ProxyCommand() :base(Name, Description)
     {
         AddOptions();
 
-        var proxyParamsBinder = new ProxyParamsBinder();
-        //this.Handler = new ProxyCommandHandler();
-
-        this.SetHandler(
-            async (ProxyCommandParams proxyParams, InvocationContext ctx) =>
-            {
-                // todo: move to smth like ProxyCommand Configuration
-                IServiceCollection ConfigureProxyServices(ProxyCommandParams param)
-                {
-                    var services = new ServiceCollection();
-
-                    services.AddLogging(builder =>
-                    {
-                        builder
-                            //.AddJsonConsole()
-                            .AddSimpleConsole(options =>
-                            {
-                                options.IncludeScopes = true;
-                                options.ColorBehavior = LoggerColorBehavior.Enabled;
-                                options.SingleLine = true;
-                                options.UseUtcTimestamp = true;
-                            });
-
-                        builder.SetMinimumLevel(LogLevel.Debug);
-                    });
-
-                    services.AddTransient<IProxyTaskPool, ProxyTaskPool>();
-
-                    //services.AddTransient(provider => provider.ResolveWith<ProxyCommandHandler>(
-                    //    param,
-                    //    provider.GetRequiredService<IProxyTaskPool>(),
-                    //    provider.GetRequiredService<ILogger<ProxyCommandHandler>>()));
-
-                    services.AddTransient<ICommandBinder<ProxyCommandParams>, ProxyParamsBinder>();
-                    services.AddTransient<IProxyCommandHandler, ProxyCommandHandler>();
-
-
-                    return services;
-                }
-
-                var services = ConfigureProxyServices(proxyParams);
-                var serviceProvider = services.BuildServiceProvider();
-
-                //var handler = new ProxyCommandHandler(proxyParams, cancellationToken);
-                var handler = serviceProvider.GetRequiredService<IProxyCommandHandler>();
-
-                await handler.InvokeAsync(ctx);
-            },
-            proxyParamsBinder);
+        var serviceProvider = ProxyServiceCollection.BuildServices();        
+        Handler = serviceProvider.GetRequiredService<IProxyCommandHandler>();
     }
 
     // Adds options for this command

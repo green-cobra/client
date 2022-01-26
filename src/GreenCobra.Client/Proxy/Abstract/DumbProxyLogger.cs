@@ -12,15 +12,15 @@ public class DumbProxyLogger : IProxyLogger
     {
         var delimiter = new string('-', 50);
 
-        Console.WriteLine();
-        Console.WriteLine(delimiter);
+        //Console.WriteLine();
+        //Console.WriteLine(delimiter);
         Console.WriteLine($"Data length: {data.Length}");
-        Console.WriteLine(delimiter);
+        //Console.WriteLine(delimiter);
 
-        var str = Encoding.UTF8.GetString(data);
-        var segment = str.Split("\r\n\r\n");
+        //var str = Encoding.UTF8.GetString(data);
+        //var segment = str.Split("\r\n\r\n");
 
-        Console.WriteLine(segment[0]);
-        Console.WriteLine(delimiter);
+        //Console.WriteLine(segment[0]);
+        //Console.WriteLine(delimiter);
     }
 }

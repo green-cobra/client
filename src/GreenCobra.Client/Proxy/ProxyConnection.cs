@@ -12,7 +12,7 @@ public class ProxyConnection : IDisposable
 
     public ProxyConnection(IPEndPoint serverEndPoint, IPEndPoint clientEndPoint)
     {
-        var dumbLogger = DumbProxyLogger.Default;
+        var dumbLogger = DumbProxyLogger.Default; // todo: inject logger
         _serverStream = new ProxyStream(serverEndPoint, dumbLogger);
         _clientStream = new ProxyStream(clientEndPoint, dumbLogger);
     }

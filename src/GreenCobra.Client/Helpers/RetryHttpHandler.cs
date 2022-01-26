@@ -1,4 +1,4 @@
-﻿namespace GreenCobra.Client.Commands.Proxy.Handlers;
+﻿namespace GreenCobra.Client.Helpers;
 
 public class RetryHttpHandler : DelegatingHandler
 {

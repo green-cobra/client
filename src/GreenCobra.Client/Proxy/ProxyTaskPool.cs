@@ -4,22 +4,12 @@ using Microsoft.Extensions.Logging;
 
 namespace GreenCobra.Client.Proxy;
 
-public interface IProxyTaskPool
-{
-    Task RunAsync(ProxyConfiguration proxyConfiguration, CancellationToken cancellationToken);
-}
-
 public class ProxyTaskPool : IProxyTaskPool
 {
-    public readonly List<Task> ProxyTasks = new();
-    public Task WatcherTask;
-
-    //private ProxyConfiguration _proxyConfiguration;
     private readonly ILogger<ProxyTaskPool> _logger;
 
     public ProxyTaskPool(ILogger<ProxyTaskPool> logger)
     {
-        //_proxyConfiguration = proxyConfiguration;
         _logger = logger;
     }
 
@@ -27,59 +17,60 @@ public class ProxyTaskPool : IProxyTaskPool
     {
         _logger.LogDebug($"Proxy pool config: {proxyConfiguration}");
 
-        WatcherTask = Task.Run(_watcherAction(cancellationToken), cancellationToken);
-
-        for (int i = 0; i < proxyConfiguration.MaxConnections; i++)
-        {
-            StartNewProxyTask(proxyConfiguration, cancellationToken);
-        }
+        var proxyPool = SpawnTasks(proxyConfiguration, cancellationToken);
+        var watcherTask = StartWatcher(proxyPool, cancellationToken);
 
         while (!cancellationToken.IsCancellationRequested)
         {
-            var completedTask = await Task.WhenAny(ProxyTasks);
-
-
-            _logger.LogDebug($"Task {completedTask.Id}; Status: {completedTask.Status}");
-            // todo: check for completed Task state
-            //if (completedTask.IsCompleted)
-            //{
-            ProxyTasks.Remove(completedTask);
-            StartNewProxyTask(proxyConfiguration, cancellationToken);
-            //}
+            var completedTask = await Task.WhenAny(proxyPool);
+            // todo: check completed task status
+            proxyPool.Remove(completedTask);
+            proxyPool.Add(StartProxy(proxyConfiguration, cancellationToken));
         }
 
-        await WatcherTask;
+        await watcherTask;
     }
 
-    private void StartNewProxyTask(ProxyConfiguration proxyConfiguration, CancellationToken cancellationToken)
+    private List<Task> SpawnTasks(ProxyConfiguration proxyConfig, CancellationToken cancellationToken)
     {
-        var proxyTask = Task.Run(async () =>
+        var tasks = new List<Task>();
+        for (var i = 0; i < proxyConfig.MaxConnections; i++)
+        {
+            tasks.Add(StartProxy(proxyConfig, cancellationToken));
+        }
+
+        return tasks;
+    }
+
+    private Task StartProxy(ProxyConfiguration proxyConfig, CancellationToken cancellationToken)
+    {
+        return Task.Run(async () =>
         {
             var state = new ProxyTaskState(Task.CurrentId.Value);
             using var scope = _logger.BeginScope(state);
-            _logger.LogDebug($"Proxy task started, id {state.Id}");
 
-            var connection = new ProxyConnection(proxyConfiguration.ServerEndPoint,
-                proxyConfiguration.LocalApplicationEndPoint);
+            var connection = new ProxyConnection(proxyConfig.ServerEndPoint,
+                proxyConfig.LocalApplicationEndPoint);
 
-            _logger.LogDebug($"Proxy connection initialized; conn_id {connection.Id}");
+            _logger.LogDebug($"Proxy started; ConnectionId: {connection.Id}");
 
             await connection.ProxyAsync(cancellationToken);
 
-            _logger.LogDebug($"Task {state.Id}; Status: task going for cancellation");
+            _logger.LogDebug($"Proxy completed; ConnectionId: {connection.Id}");
+
         }, cancellationToken);
-        
-        ProxyTasks.Add(proxyTask);
     }
 
-    private Action _watcherAction(CancellationToken ct) =>
-        () =>
+    private Task StartWatcher(List<Task> pool, CancellationToken cancellationToken)
+    {
+        return Task.Run(() =>
         {
-            while (!ct.IsCancellationRequested)
+            while (!cancellationToken.IsCancellationRequested)
             {
-                _logger.LogDebug($"Actively running at pool:{ProxyTasks.Count}");
+                _logger.LogDebug($"Actively running at pool:{pool.Count}");
 
                 Thread.Sleep(TimeSpan.FromSeconds(5));
             }
-        };
+        }, cancellationToken);
+    }
 }

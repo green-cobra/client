@@ -29,4 +29,8 @@
 		<PackageReference Include="System.CommandLine" Version="2.0.0-beta2.21617.1" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Commands\Proxy\Infrastructure\" />
+	</ItemGroup>
+
 </Project>

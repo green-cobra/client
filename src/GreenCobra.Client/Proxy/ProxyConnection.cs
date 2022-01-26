@@ -17,10 +17,10 @@ public class ProxyConnection : IDisposable
         _clientStream = new ProxyStream(clientEndPoint, dumbLogger);
     }
 
-    public async Task ProxyAsync()
+    public async Task ProxyAsync(CancellationToken cancellationToken)
     {
-        var serverToClient = _serverStream.CopyAsync(_clientStream);
-        var clientToServer = _clientStream.CopyAsync(_serverStream);
+        var serverToClient = _serverStream.CopyAsync(_clientStream, cancellationToken);
+        var clientToServer = _clientStream.CopyAsync(_serverStream, cancellationToken);
 
         await Task.WhenAll(serverToClient, clientToServer);
     }

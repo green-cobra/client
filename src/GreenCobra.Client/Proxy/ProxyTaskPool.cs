@@ -4,47 +4,54 @@ using Microsoft.Extensions.Logging;
 
 namespace GreenCobra.Client.Proxy;
 
-public class ProxyTaskPool
+public interface IProxyTaskPool
+{
+    Task RunAsync(ProxyConfiguration proxyConfiguration, CancellationToken cancellationToken);
+}
+
+public class ProxyTaskPool : IProxyTaskPool
 {
     public readonly List<Task> ProxyTasks = new();
     public Task WatcherTask;
 
-    private readonly ProxyConfiguration _proxyConfiguration;
+    //private ProxyConfiguration _proxyConfiguration;
     private readonly ILogger<ProxyTaskPool> _logger;
 
-    public ProxyTaskPool(ProxyConfiguration proxyConfiguration)
+    public ProxyTaskPool(ILogger<ProxyTaskPool> logger)
     {
-        _proxyConfiguration = proxyConfiguration;
-        _logger = CommandLoggerFactory.GetLogger<ProxyTaskPool>();
-
-        _logger.LogDebug($"Proxy pool config: {proxyConfiguration}");
+        //_proxyConfiguration = proxyConfiguration;
+        _logger = logger;
     }
 
-    public async Task RunAsync(CancellationToken cancellationToken)
+    public async Task RunAsync(ProxyConfiguration proxyConfiguration, CancellationToken cancellationToken)
     {
+        _logger.LogDebug($"Proxy pool config: {proxyConfiguration}");
+
         WatcherTask = Task.Run(_watcherAction(cancellationToken), cancellationToken);
 
-        for (int i = 0; i < _proxyConfiguration.MaxConnections; i++)
+        for (int i = 0; i < proxyConfiguration.MaxConnections; i++)
         {
-            StartNewProxyTask(cancellationToken);
+            StartNewProxyTask(proxyConfiguration, cancellationToken);
         }
 
         while (!cancellationToken.IsCancellationRequested)
         {
             var completedTask = await Task.WhenAny(ProxyTasks);
 
+
+            _logger.LogDebug($"Task {completedTask.Id}; Status: {completedTask.Status}");
             // todo: check for completed Task state
             //if (completedTask.IsCompleted)
             //{
             ProxyTasks.Remove(completedTask);
-            StartNewProxyTask(cancellationToken);
+            StartNewProxyTask(proxyConfiguration, cancellationToken);
             //}
         }
 
         await WatcherTask;
     }
 
-    private void StartNewProxyTask(CancellationToken cancellationToken)
+    private void StartNewProxyTask(ProxyConfiguration proxyConfiguration, CancellationToken cancellationToken)
     {
         var proxyTask = Task.Run(async () =>
         {
@@ -52,12 +59,14 @@ public class ProxyTaskPool
             using var scope = _logger.BeginScope(state);
             _logger.LogDebug($"Proxy task started, id {state.Id}");
 
-            var connection = new ProxyConnection(_proxyConfiguration.ServerEndPoint,
-                _proxyConfiguration.LocalApplicationEndPoint);
+            var connection = new ProxyConnection(proxyConfiguration.ServerEndPoint,
+                proxyConfiguration.LocalApplicationEndPoint);
 
             _logger.LogDebug($"Proxy connection initialized; conn_id {connection.Id}");
 
-            await connection.ProxyAsync();
+            await connection.ProxyAsync(cancellationToken);
+
+            _logger.LogDebug($"Task {state.Id}; Status: task going for cancellation");
         }, cancellationToken);
         
         ProxyTasks.Add(proxyTask);

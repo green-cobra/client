@@ -1,38 +1,38 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Console;
+﻿//using Microsoft.Extensions.Logging;
+//using Microsoft.Extensions.Logging.Console;
 
-namespace GreenCobra.Client.Logging;
+//namespace GreenCobra.Client.Logging;
 
-public class CommandLoggerFactory : IDisposable
-{
-    private static readonly ILoggerFactory LoggerFactoryInstance;
+//public class CommandLoggerFactory : IDisposable
+//{
+//    private static readonly ILoggerFactory LoggerFactoryInstance;
 
-    private CommandLoggerFactory() { }
+//    private CommandLoggerFactory() { }
 
-    static CommandLoggerFactory()
-    {
-        // todo: use Service Collection around whole application
-        // todo: move to config file
-        LoggerFactoryInstance = LoggerFactory.Create(builder =>
-        {
-            builder
-                //.AddJsonConsole()
-                .AddSimpleConsole(options =>
-                {
-                    options.IncludeScopes = true;
-                    options.ColorBehavior = LoggerColorBehavior.Enabled;
-                    options.SingleLine = true;
-                    options.UseUtcTimestamp = true;
-                });
+//    static CommandLoggerFactory()
+//    {
+//        // todo: use Service Collection around whole application
+//        // todo: move to config file
+//        LoggerFactoryInstance = LoggerFactory.Create(builder =>
+//        {
+//            builder
+//                //.AddJsonConsole()
+//                .AddSimpleConsole(options =>
+//                {
+//                    options.IncludeScopes = true;
+//                    options.ColorBehavior = LoggerColorBehavior.Enabled;
+//                    options.SingleLine = true;
+//                    options.UseUtcTimestamp = true;
+//                });
 
-            builder.SetMinimumLevel(LogLevel.Debug);
-        });
-    }
+//            builder.SetMinimumLevel(LogLevel.Debug);
+//        });
+//    }
 
-    public static ILogger<T> GetLogger<T>() => LoggerFactoryInstance.CreateLogger<T>();
+//    public static ILogger<T> GetLogger<T>() => LoggerFactoryInstance.CreateLogger<T>();
 
-    public void Dispose()
-    {
-        LoggerFactoryInstance.Dispose();
-    }
-}
+//    public void Dispose()
+//    {
+//        LoggerFactoryInstance.Dispose();
+//    }
+//}

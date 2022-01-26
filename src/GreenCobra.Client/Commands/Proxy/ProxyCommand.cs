@@ -4,6 +4,11 @@ using System.CommandLine.Invocation;
 using System.Net;
 using GreenCobra.Client.Commands.Proxy.Configuration;
 using GreenCobra.Client.Commands.Proxy.Handlers;
+using GreenCobra.Client.Helpers;
+using GreenCobra.Client.Proxy;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
 
 namespace GreenCobra.Client.Commands.Proxy;
 
@@ -52,13 +57,50 @@ public class ProxyCommand : Command
         AddOptions();
 
         var proxyParamsBinder = new ProxyParamsBinder();
+        //this.Handler = new ProxyCommandHandler();
 
         this.SetHandler(
-            async (ProxyCommandParams proxyParams,
-                InvocationContext ctx,
-                CancellationToken cancellationToken) =>
+            async (ProxyCommandParams proxyParams, InvocationContext ctx) =>
             {
-                var handler = new ProxyCommandHandler(proxyParams, cancellationToken);
+                // todo: move to smth like ProxyCommand Configuration
+                IServiceCollection ConfigureProxyServices(ProxyCommandParams param)
+                {
+                    var services = new ServiceCollection();
+
+                    services.AddLogging(builder =>
+                    {
+                        builder
+                            //.AddJsonConsole()
+                            .AddSimpleConsole(options =>
+                            {
+                                options.IncludeScopes = true;
+                                options.ColorBehavior = LoggerColorBehavior.Enabled;
+                                options.SingleLine = true;
+                                options.UseUtcTimestamp = true;
+                            });
+
+                        builder.SetMinimumLevel(LogLevel.Debug);
+                    });
+
+                    services.AddTransient<IProxyTaskPool, ProxyTaskPool>();
+
+                    //services.AddTransient(provider => provider.ResolveWith<ProxyCommandHandler>(
+                    //    param,
+                    //    provider.GetRequiredService<IProxyTaskPool>(),
+                    //    provider.GetRequiredService<ILogger<ProxyCommandHandler>>()));
+
+                    services.AddTransient<ICommandBinder<ProxyCommandParams>, ProxyParamsBinder>();
+                    services.AddTransient<IProxyCommandHandler, ProxyCommandHandler>();
+
+
+                    return services;
+                }
+
+                var services = ConfigureProxyServices(proxyParams);
+                var serviceProvider = services.BuildServiceProvider();
+
+                //var handler = new ProxyCommandHandler(proxyParams, cancellationToken);
+                var handler = serviceProvider.GetRequiredService<IProxyCommandHandler>();
 
                 await handler.InvokeAsync(ctx);
             },
@@ -74,8 +116,13 @@ public class ProxyCommand : Command
         AddOption(RemoteDomainOption);
     }
 
-    private class ProxyParamsBinder : BinderBase<ProxyCommandParams>
+    public class ProxyParamsBinder : BinderBase<ProxyCommandParams>, ICommandBinder<ProxyCommandParams>
     {
+        public ProxyCommandParams BindParametersFromContext(BindingContext bindingContext)
+        {
+            return GetBoundValue(bindingContext);
+        }
+
         protected override ProxyCommandParams GetBoundValue(BindingContext bindingContext)
         {
             T? GetOptionValue<T>(Option<T> option) => bindingContext.ParseResult.GetValueForOption(option);
@@ -91,4 +138,9 @@ public class ProxyCommand : Command
             );
         }
     }
+}
+
+public interface ICommandBinder<out T>
+{
+    public T BindParametersFromContext(BindingContext bindingContext);
 }

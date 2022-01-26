@@ -19,7 +19,7 @@ public class ProxyStream : IDisposable
         _socket = new(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
     }
 
-    public async Task CopyAsync(ProxyStream destination)
+    public async Task CopyAsync(ProxyStream destination, CancellationToken cancellationToken)
     {
         await ConnectIfNotConnectedAsync();
         
@@ -29,11 +29,11 @@ public class ProxyStream : IDisposable
         try
         {
             int bytesRead;
-            while ((bytesRead = await ReadAsync(buffer)) != 0)
+            while ((bytesRead = await ReadAsync(buffer, cancellationToken)) != 0)
             {
                 _logger.LogBinary(buffer[..bytesRead]);
                 
-                await destination.WriteAsync(buffer[..bytesRead]);
+                await destination.WriteAsync(buffer[..bytesRead], cancellationToken);
             }
         }
         finally
@@ -48,20 +48,20 @@ public class ProxyStream : IDisposable
             await _socket.ConnectAsync(_endPoint);
     }
 
-    public async Task<int> WriteAsync(byte[] buffer)
+    public async Task<int> WriteAsync(byte[] buffer, CancellationToken cancellationToken)
     {
         await ConnectIfNotConnectedAsync();
 
-        var sendCount = await _socket.SendAsync(buffer, SocketFlags.None);
+        var sendCount = await _socket.SendAsync(buffer, SocketFlags.None, cancellationToken);
 
         return sendCount;
     }
 
-    public async Task<int> ReadAsync(byte[] buffer)
+    public async Task<int> ReadAsync(byte[] buffer, CancellationToken cancellationToken)
     {
         await ConnectIfNotConnectedAsync();
 
-        var receivedCount = await _socket.ReceiveAsync(buffer, SocketFlags.None);
+        var receivedCount = await _socket.ReceiveAsync(buffer, SocketFlags.None, cancellationToken);
 
         return receivedCount;
     }

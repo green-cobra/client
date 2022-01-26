@@ -1,4 +1,5 @@
-﻿using System.CommandLine.Invocation;
+﻿using System.CommandLine.Binding;
+using System.CommandLine.Invocation;
 using System.Net;
 using System.Net.Http.Json;
 using System.Net.Sockets;
@@ -10,56 +11,74 @@ using Microsoft.Extensions.Logging;
 
 namespace GreenCobra.Client.Commands.Proxy.Handlers;
 
-public class ProxyCommandHandler : ICommandHandler
+public interface IProxyCommandHandler : ICommandHandler
 {
-    private readonly ProxyCommandParams _proxyParams;
-    private readonly CancellationToken _cancellationToken;
 
+}
+
+public class ProxyCommandHandler : IProxyCommandHandler // ICommandHandler
+{
+    private ProxyCommandParams _proxyParams;
+    //private CancellationToken _cancellationToken;
+
+    private readonly ICommandBinder<ProxyCommandParams> _paramsBinder;
     private readonly ILogger<ProxyCommandHandler> _logger;
-    
-    public ProxyCommandHandler(ProxyCommandParams proxyParams, CancellationToken cancellationToken)
-    {
-        _proxyParams = proxyParams;
-        _cancellationToken = cancellationToken;
+    private readonly IProxyTaskPool _proxyTaskPool;
 
-        _logger = CommandLoggerFactory.GetLogger<ProxyCommandHandler>();
-        _logger.LogDebug($"{_proxyParams}");
+    public ProxyCommandHandler(
+        //ProxyCommandParams proxyParams,
+        //CancellationToken cancellationToken,
+        ICommandBinder<ProxyCommandParams> paramsBinder,
+        IProxyTaskPool proxyTaskPool,
+        ILogger<ProxyCommandHandler> logger)
+    {
+        //_proxyParams = proxyParams;
+        //_cancellationToken = cancellationToken;
+        _proxyTaskPool = proxyTaskPool;
+
+        _logger = logger;
+        _paramsBinder = paramsBinder;
+        //_logger.LogDebug($"{_proxyParams}");
     }
 
     public async Task<int> InvokeAsync(InvocationContext context)
     {
-        // init step - retrieving configs
-        var proxyConnectionConfig = await GetProxyServerConfigurationAsync();
+        //var symbol = new ProxyCommand.ProxyParamsBinder();
+        //var @params = symbol.BindParametersFromContext(context.BindingContext);
+        _proxyParams = _paramsBinder.BindParametersFromContext(context.BindingContext);
+        var cancellationToken = context.GetCancellationToken();
 
-        var proxyServerEndPoint = await ResolveProxyServerEndPointAsync(proxyConnectionConfig);
+        // init step - retrieving configs
+        var proxyConnectionConfig = await GetProxyServerConfigurationAsync(cancellationToken);
+
+        var proxyServerEndPoint = await ResolveProxyServerEndPointAsync(proxyConnectionConfig, cancellationToken);
         var proxyConfig = new ProxyConfiguration(
             proxyServerEndPoint,
             _proxyParams.LocalServerEndPoint,
             proxyConnectionConfig.MaxConnections);
 
-        Dashboard.DisplayProxyConnectionConfiguration(proxyConnectionConfig);
         _logger.LogDebug($"Proxy server {proxyServerEndPoint}");
 
         // init Task pool
-        var taskPool = new ProxyTaskPool(proxyConfig);
+        //var taskPool = new ProxyTaskPool(proxyConfig);
 
         // wait until app will not be closed
-        await taskPool.RunAsync(_cancellationToken);
+        await _proxyTaskPool.RunAsync(proxyConfig, cancellationToken);
 
         // todo: resolve status code
-        return 0;
+        return context.ExitCode;
     }
 
-    private async Task<ProxyConnectionConfiguration> GetProxyServerConfigurationAsync()
+    private async Task<ProxyConnectionConfiguration> GetProxyServerConfigurationAsync(CancellationToken cancellationToken)
     {
         using var retryHandler = new RetryHttpHandler();
         using var httpClient = new HttpClient(retryHandler) {BaseAddress = _proxyParams.RemoteServerUrl};
-        var response = await httpClient.GetAsync(_proxyParams.RemoteDomainRequest, _cancellationToken);
+        var response = await httpClient.GetAsync(_proxyParams.RemoteDomainRequest, cancellationToken);
 
         response.EnsureSuccessStatusCode();
 
         var proxyConnectionConfig = await response.Content.ReadFromJsonAsync<ProxyConnectionConfiguration>(
-                cancellationToken: _cancellationToken);
+                cancellationToken: cancellationToken);
 
         // todo: update exception
         if (proxyConnectionConfig is null)
@@ -70,10 +89,11 @@ public class ProxyCommandHandler : ICommandHandler
         return proxyConnectionConfig;
     }
 
-    private async Task<IPEndPoint> ResolveProxyServerEndPointAsync(ProxyConnectionConfiguration connectionConfig)
+    private async Task<IPEndPoint> ResolveProxyServerEndPointAsync(
+        ProxyConnectionConfiguration connectionConfig, CancellationToken cancellationToken)
     {
         var ipAddress = (await Dns.GetHostAddressesAsync(
-                connectionConfig.ServerUrl.DnsSafeHost, AddressFamily.InterNetwork, _cancellationToken))
+                connectionConfig.ServerUrl.DnsSafeHost, AddressFamily.InterNetwork, cancellationToken))
             .First();
         
         return new IPEndPoint(ipAddress, connectionConfig.ServerPort);

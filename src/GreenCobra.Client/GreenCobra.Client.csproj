@@ -30,7 +30,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Commands\Proxy\Infrastructure\" />
+	  <None Update="appsettings.json">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>
 
 </Project>

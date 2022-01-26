@@ -1,9 +1,9 @@
 ﻿using GreenCobra.Client.Commands.Proxy.Configuration;
 using GreenCobra.Client.Commands.Proxy.Handlers;
 using GreenCobra.Client.Proxy;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Console;
 
 namespace GreenCobra.Client.Commands.Proxy.Infrastructure;
 
@@ -22,24 +22,19 @@ public static class ProxyServiceCollection
     {
         var services = new ServiceCollection();
 
+        var configuration = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
+            .Build();
+        services.AddSingleton(configuration);
+
         services.AddLogging(builder =>
         {
-            builder
-                //.AddJsonConsole()
-                .AddSimpleConsole(options =>
-                {
-                    options.IncludeScopes = true;
-                    options.ColorBehavior = LoggerColorBehavior.Enabled;
-                    options.SingleLine = true;
-                    options.UseUtcTimestamp = true;
-                });
-
-            builder.SetMinimumLevel(LogLevel.Debug);
+            builder.AddConfiguration(configuration.GetSection("Logging"));
+            builder.AddSimpleConsole();
         });
 
-
         services.AddTransient<IProxyTaskPool, ProxyTaskPool>();
-
         services.AddTransient<ICommandBinder<ProxyCommandParams>, ProxyCommand.ProxyParamsBinder>();
         services.AddTransient<IProxyCommandHandler, ProxyCommandHandler>();
 

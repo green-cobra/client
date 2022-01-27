@@ -1,7 +1,7 @@
 ﻿using System.Buffers;
 using System.Net;
 using System.Net.Sockets;
-using GreenCobra.Client.Proxy.Abstract;
+using GreenCobra.Client.Logging;
 
 namespace GreenCobra.Client.Proxy;
 
@@ -10,13 +10,13 @@ public class ProxyStream : IDisposable
     private readonly Socket _socket;
     private readonly IPEndPoint _endPoint;
 
-    private readonly IProxyLogger _logger;
+    private readonly ILoggerAdapter<ProxyStream, byte[]> _logger;
 
-    public ProxyStream(IPEndPoint endPoint, IProxyLogger logger)
+    public ProxyStream(IPEndPoint endPoint, ILoggerAdapter<ProxyStream, byte[]> logger)
     {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
         _endPoint = endPoint;
+        _logger = logger;// ?? throw new ArgumentNullException(nameof(logger)); ;
+        
         _socket = new(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
     }
 
@@ -32,7 +32,7 @@ public class ProxyStream : IDisposable
             int bytesRead;
             while ((bytesRead = await ReadAsync(buffer, cancellationToken)) != 0)
             {
-                _logger.LogBinary(buffer[..bytesRead]);
+                _logger.LogInfo(buffer[..bytesRead]);
                 
                 await destination.WriteAsync(buffer[..bytesRead], cancellationToken);
             }

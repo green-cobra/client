@@ -4,6 +4,7 @@ using System.Net.Http.Json;
 using System.Net.Sockets;
 using GreenCobra.Client.Commands.Proxy.Configuration;
 using GreenCobra.Client.Helpers;
+using GreenCobra.Client.Logging;
 using GreenCobra.Client.Proxy;
 using Microsoft.Extensions.Logging;
 
@@ -12,17 +13,21 @@ namespace GreenCobra.Client.Commands.Proxy.Handlers;
 public class ProxyCommandHandler : IProxyCommandHandler
 {
     private readonly ICommandBinder<ProxyCommandParams> _paramsBinder;
-    private readonly ILogger<ProxyCommandHandler> _logger;
+    //private readonly ILogger<ProxyCommandHandler> _logger;
+    private readonly ILoggerAdapter<ProxyCommandHandler, string> _logger;
     private readonly IProxyTaskPool _proxyTaskPool;
 
     public ProxyCommandHandler(
         ICommandBinder<ProxyCommandParams> paramsBinder,
         IProxyTaskPool proxyTaskPool,
-        ILogger<ProxyCommandHandler> logger)
+        ILoggerAdapter<ProxyCommandHandler, string> logger
+        //ILogger<ProxyCommandHandler> logger
+        )
     {
         _paramsBinder = paramsBinder ?? throw new ArgumentNullException(nameof(paramsBinder));
         _proxyTaskPool = proxyTaskPool ?? throw new ArgumentNullException(nameof(proxyTaskPool));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _logger = logger;
+        //_logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public async Task<int> InvokeAsync(InvocationContext context)
@@ -33,7 +38,8 @@ public class ProxyCommandHandler : IProxyCommandHandler
         // init step - retrieving configs
         var connectionConfig = await GetConnectionConfigurationAsync(commandParams, cancellationToken);
         
-        _logger.LogDebug($"Connection info: {connectionConfig}");
+        //_logger.LogDebug($"Connection info: {connectionConfig}");
+        _logger.LogInfo($"Connection info: {connectionConfig}");
 
         var proxyServerEndPoint = await ResolveProxyServerEndPointAsync(connectionConfig, cancellationToken);
         var proxyConfig = new ProxyConfiguration(

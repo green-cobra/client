@@ -7,10 +7,12 @@ namespace GreenCobra.Client.Proxy;
 public class ProxyTaskPool : IProxyTaskPool
 {
     private readonly ILogger<ProxyTaskPool> _logger;
+    private readonly ILoggerAdapter<ProxyStream, byte[]> _proxyLogger;
 
-    public ProxyTaskPool(ILogger<ProxyTaskPool> logger)
+    public ProxyTaskPool(ILogger<ProxyTaskPool> logger, ILoggerAdapter<ProxyStream, byte[]> proxyLogger)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _proxyLogger = proxyLogger;
     }
 
     public async Task RunAsync(ProxyConfiguration proxyConfiguration, CancellationToken cancellationToken)
@@ -46,18 +48,18 @@ public class ProxyTaskPool : IProxyTaskPool
     {
         return Task.Run(async () =>
         {
-            var state = new ProxyTaskState(Task.CurrentId.Value);
+            var state = new ProxyTaskState(Task.CurrentId.Value, "This is Task");
             using var scope = _logger.BeginScope(state);
 
-            var connection = new ProxyConnection(proxyConfig.ServerEndPoint,
-                proxyConfig.LocalApplicationEndPoint);
+            using var clientStream = new ProxyStream(proxyConfig.LocalApplicationEndPoint, _proxyLogger);
+            using var serverStream = new ProxyStream(proxyConfig.ServerEndPoint, _proxyLogger);
 
-            _logger.LogDebug($"Proxy started; ConnectionId: {connection.Id}");
+            var serverToClient = serverStream.CopyAsync(clientStream, cancellationToken);
+            var clientToServer = clientStream.CopyAsync(serverStream, cancellationToken);
 
-            await connection.ProxyAsync(cancellationToken);
+            await Task.WhenAll(serverToClient, clientToServer);
 
-            _logger.LogDebug($"Proxy completed; ConnectionId: {connection.Id}");
-
+            _logger.LogDebug($"Proxy completed; TaskId: {Task.CurrentId.Value}");
         }, cancellationToken);
     }
 

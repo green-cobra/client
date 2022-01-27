@@ -1,19 +1,19 @@
 ﻿using System.Text;
-using Microsoft.Extensions.Logging;
 
 namespace GreenCobra.Client.Logging;
 
-public class DefaultLoggerFormatter : ILoggerFormatter<string>
+public class StringLoggerFormatter : ILoggerFormatter<string>
 {
-    public string FormatOutput(string input)
+    public string FormatOutput(string input, Exception? ex)
     {
+        // todo: check Exception
         return input;
     }
 }
 
 public class BinaryLoggerFormatter : ILoggerFormatter<byte[]>
 {
-    public string FormatOutput(byte[] input)
+    public string FormatOutput(byte[] input, Exception? ex)
     {
         //Console.WriteLine();
         //Console.WriteLine(delimiter);
@@ -21,18 +21,18 @@ public class BinaryLoggerFormatter : ILoggerFormatter<byte[]>
         //Console.WriteLine(delimiter);
 
         var str = Encoding.UTF8.GetString(input);
-        //var segment = str.Split("\r\n\r\n");
+        var segment = str.Split("\r\n\r\n");
 
-        //Console.WriteLine(segment[0]);
+        Console.WriteLine(segment[0]);
         //Console.WriteLine(delimiter);
 
         return $"{dataLength}\r\n{str}";
     }
 }
 
-public interface ILoggerFormatter<in T>
+public interface ILoggerFormatter<in TState>
 {
-    string FormatOutput(T input);
+    string FormatOutput(TState state, Exception? ex);
 }
 
 //public class LoggerMessage<T> where T : IStateInfo
@@ -45,10 +45,16 @@ public interface ILoggerFormatter<in T>
 //    public T State { get; set; }
 //}
 
-// public record ProxyTaskState(int Id, string Name);
-//public interface IStateInfo
-//{
-//    string GetInOutputFormat();
-//}
+public enum EventIds
+{
+    // config events
+    RetrievedProxyPoolConfig = 10,
+    RetrievedProxyServerConfig = 20,
 
-//public enum EventId { }
+    // proxying events
+    ProxyTaskCompleted = 100,
+    DataProxied = 1000,
+
+    // other events
+    PoolWatcher_GotPoolStatus = 5000
+}

@@ -36,11 +36,11 @@ public static class ProxyServiceCollection
         });
 
 
-        services.AddTransient<ILoggerFormatter<string>, DefaultLoggerFormatter>();
+        services.AddTransient<ILoggerFormatter<string>, StringLoggerFormatter>();
         services.AddTransient<ILoggerFormatter<byte[]>, BinaryLoggerFormatter>();
         
         services.AddTransient(typeof(ILoggerAdapter<,>),
-            typeof(BaseLoggerAdapter<,>));
+            typeof(LoggerAdapter<,>));
 
         services.AddTransient<IProxyTaskPool, ProxyTaskPool>();
         services.AddTransient<ICommandBinder<ProxyCommandParams>, ProxyCommand.ProxyParamsBinder>();

@@ -6,23 +6,19 @@ using GreenCobra.Client.Commands.Proxy.Configuration;
 using GreenCobra.Client.Helpers;
 using GreenCobra.Client.Logging;
 using GreenCobra.Client.Proxy;
-using Microsoft.Extensions.Logging;
 
 namespace GreenCobra.Client.Commands.Proxy.Handlers;
 
 public class ProxyCommandHandler : IProxyCommandHandler
 {
     private readonly ICommandBinder<ProxyCommandParams> _paramsBinder;
-    //private readonly ILogger<ProxyCommandHandler> _logger;
     private readonly ILoggerAdapter<ProxyCommandHandler, string> _logger;
     private readonly IProxyTaskPool _proxyTaskPool;
 
     public ProxyCommandHandler(
         ICommandBinder<ProxyCommandParams> paramsBinder,
         IProxyTaskPool proxyTaskPool,
-        ILoggerAdapter<ProxyCommandHandler, string> logger
-        //ILogger<ProxyCommandHandler> logger
-        )
+        ILoggerAdapter<ProxyCommandHandler, string> logger)
     {
         _paramsBinder = paramsBinder ?? throw new ArgumentNullException(nameof(paramsBinder));
         _proxyTaskPool = proxyTaskPool ?? throw new ArgumentNullException(nameof(proxyTaskPool));
@@ -39,7 +35,7 @@ public class ProxyCommandHandler : IProxyCommandHandler
         var connectionConfig = await GetConnectionConfigurationAsync(commandParams, cancellationToken);
         
         //_logger.LogDebug($"Connection info: {connectionConfig}");
-        _logger.LogInfo($"Connection info: {connectionConfig}");
+        _logger.LogInformation(EventIds.RetrievedProxyServerConfig, $"Connection info: {connectionConfig}");
 
         var proxyServerEndPoint = await ResolveProxyServerEndPointAsync(connectionConfig, cancellationToken);
         var proxyConfig = new ProxyConfiguration(

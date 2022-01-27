@@ -15,7 +15,7 @@ public class ProxyStream : IDisposable
     public ProxyStream(IPEndPoint endPoint, ILoggerAdapter<ProxyStream, byte[]> logger)
     {
         _endPoint = endPoint;
-        _logger = logger;// ?? throw new ArgumentNullException(nameof(logger)); ;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         
         _socket = new(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
     }
@@ -32,7 +32,9 @@ public class ProxyStream : IDisposable
             int bytesRead;
             while ((bytesRead = await ReadAsync(buffer, cancellationToken)) != 0)
             {
-                _logger.LogInfo(buffer[..bytesRead]);
+                //_logger.LogInformation(buffer[..bytesRead]);
+                
+                _logger.LogInformation(EventIds.DataProxied, buffer[..bytesRead]);
                 
                 await destination.WriteAsync(buffer[..bytesRead], cancellationToken);
             }

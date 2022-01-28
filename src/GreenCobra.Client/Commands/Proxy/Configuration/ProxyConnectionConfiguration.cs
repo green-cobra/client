@@ -2,7 +2,7 @@
 
 namespace GreenCobra.Client.Commands.Proxy.Configuration;
 
-public record ProxyConnectionConfiguration(
+public record ProxyServerConfiguration(
     [property: JsonPropertyName("id")] string Domain,
     [property: JsonPropertyName("max_conn_count")] int MaxConnections,
     [property: JsonPropertyName("port")] int ServerPort,

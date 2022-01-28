@@ -2,21 +2,25 @@
 using System.Net;
 using System.Net.Sockets;
 using GreenCobra.Client.Logging;
+using GreenCobra.Client.Logging.States;
 
 namespace GreenCobra.Client.Proxy;
 
 public class ProxyStream : IDisposable
 {
+    public EndPoint? DestinationEndPoint => _socket.RemoteEndPoint;
+
     private readonly Socket _socket;
     private readonly IPEndPoint _endPoint;
+    
+    private readonly ILoggerAdapter<ProxyStream>? _logger;
 
-    private readonly ILoggerAdapter<ProxyStream, byte[]> _logger;
+    public ProxyStream(IPEndPoint endPoint) : this(endPoint, null) { }
 
-    public ProxyStream(IPEndPoint endPoint, ILoggerAdapter<ProxyStream, byte[]> logger)
+    public ProxyStream(IPEndPoint endPoint, ILoggerAdapter<ProxyStream>? logger)
     {
         _endPoint = endPoint;
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        
+        _logger = logger;  
         _socket = new(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
     }
 
@@ -32,11 +36,16 @@ public class ProxyStream : IDisposable
             int bytesRead;
             while ((bytesRead = await ReadAsync(buffer, cancellationToken)) != 0)
             {
-                //_logger.LogInformation(buffer[..bytesRead]);
-                
-                _logger.LogInformation(EventIds.DataProxied, buffer[..bytesRead]);
-                
-                await destination.WriteAsync(buffer[..bytesRead], cancellationToken);
+                var valuableBytes = buffer[..bytesRead];
+                await destination.WriteAsync(valuableBytes, cancellationToken);
+
+                _logger?.LogInformation(new ProxyStreamState
+                {
+                    EventId = LoggingEventId.ProxyStream_DataProxied,
+                    Data = valuableBytes,
+                    From = _socket.RemoteEndPoint,
+                    To = destination.DestinationEndPoint
+                });
             }
         }
         finally

@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using GreenCobra.Client.Commands.Proxy.Configuration;
 using GreenCobra.Client.Helpers;
 using GreenCobra.Client.Logging;
+using GreenCobra.Client.Logging.States;
 using GreenCobra.Client.Proxy;
 
 namespace GreenCobra.Client.Commands.Proxy.Handlers;
@@ -12,18 +13,18 @@ namespace GreenCobra.Client.Commands.Proxy.Handlers;
 public class ProxyCommandHandler : IProxyCommandHandler
 {
     private readonly ICommandBinder<ProxyCommandParams> _paramsBinder;
-    private readonly ILoggerAdapter<ProxyCommandHandler, string> _logger;
+    private readonly ILoggerAdapter<ProxyCommandHandler> _logger;
+
     private readonly IProxyTaskPool _proxyTaskPool;
 
     public ProxyCommandHandler(
         ICommandBinder<ProxyCommandParams> paramsBinder,
         IProxyTaskPool proxyTaskPool,
-        ILoggerAdapter<ProxyCommandHandler, string> logger)
+        ILoggerAdapter<ProxyCommandHandler> logger)
     {
         _paramsBinder = paramsBinder ?? throw new ArgumentNullException(nameof(paramsBinder));
         _proxyTaskPool = proxyTaskPool ?? throw new ArgumentNullException(nameof(proxyTaskPool));
-        _logger = logger;
-        //_logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public async Task<int> InvokeAsync(InvocationContext context)
@@ -34,14 +35,18 @@ public class ProxyCommandHandler : IProxyCommandHandler
         // init step - retrieving configs
         var connectionConfig = await GetConnectionConfigurationAsync(commandParams, cancellationToken);
         
-        //_logger.LogDebug($"Connection info: {connectionConfig}");
-        _logger.LogInformation(EventIds.RetrievedProxyServerConfig, $"Connection info: {connectionConfig}");
-
         var proxyServerEndPoint = await ResolveProxyServerEndPointAsync(connectionConfig, cancellationToken);
         var proxyConfig = new ProxyConfiguration(
             proxyServerEndPoint,
             commandParams.LocalApplicationEndPoint,
             connectionConfig.MaxConnections);
+
+        _logger.LogInformation(new ConfigurationState
+        {
+            EventId = LoggingEventId.Proxy_ConfigurationDone,
+            ConnectionConfiguration = connectionConfig, 
+            ProxyConfiguration = proxyConfig
+        });
 
         // wait until app will not be closed
         await _proxyTaskPool.RunAsync(proxyConfig, cancellationToken);
@@ -50,7 +55,7 @@ public class ProxyCommandHandler : IProxyCommandHandler
     }
 
     // todo: this can be moved to separate service when we will resolve LocalTunnel server and our
-    private async Task<ProxyConnectionConfiguration> GetConnectionConfigurationAsync(ProxyCommandParams commandParams, CancellationToken cancellationToken)
+    private async Task<ProxyServerConfiguration> GetConnectionConfigurationAsync(ProxyCommandParams commandParams, CancellationToken cancellationToken)
     {
         using var retryHandler = new RetryHttpHandler();
         using var httpClient = new HttpClient(retryHandler) {BaseAddress = commandParams.RemoteServerUrl};
@@ -58,7 +63,7 @@ public class ProxyCommandHandler : IProxyCommandHandler
 
         response.EnsureSuccessStatusCode();
 
-        var proxyConnectionConfig = await response.Content.ReadFromJsonAsync<ProxyConnectionConfiguration>(
+        var proxyConnectionConfig = await response.Content.ReadFromJsonAsync<ProxyServerConfiguration>(
                 cancellationToken: cancellationToken);
 
         // todo: update exception
@@ -68,7 +73,7 @@ public class ProxyCommandHandler : IProxyCommandHandler
         return proxyConnectionConfig;
     }
 
-    private async Task<IPEndPoint> ResolveProxyServerEndPointAsync(ProxyConnectionConfiguration connectionConfig, CancellationToken cancellationToken)
+    private async Task<IPEndPoint> ResolveProxyServerEndPointAsync(ProxyServerConfiguration connectionConfig, CancellationToken cancellationToken)
     {
         var ipAddress = (await Dns.GetHostAddressesAsync(connectionConfig.ServerUrl.DnsSafeHost,
             AddressFamily.InterNetwork, cancellationToken)).First();

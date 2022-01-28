@@ -5,6 +5,7 @@ using GreenCobra.Client.Proxy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
 
 namespace GreenCobra.Client.Commands.Proxy.Infrastructure;
 
@@ -32,28 +33,20 @@ public static class ProxyServiceCollection
         services.AddLogging(builder =>
         {
             builder.AddConfiguration(configuration.GetSection("Logging"));
-            builder.AddSimpleConsole();
+            //builder.AddSimpleConsole();
+            builder.AddConsoleFormatter<UIConsoleFormatter, ConsoleFormatterOptions>();
+            builder.AddConsole(options =>
+            {
+                options.FormatterName = "ConsoleUi";
+            });
         });
 
-
-        services.AddTransient<ILoggerFormatter<string>, StringLoggerFormatter>();
-        services.AddTransient<ILoggerFormatter<byte[]>, BinaryLoggerFormatter>();
-        
-        services.AddTransient(typeof(ILoggerAdapter<,>),
-            typeof(LoggerAdapter<,>));
+        services.AddTransient(typeof(ILoggerAdapter<>), typeof(LoggerAdapter<>));
 
         services.AddTransient<IProxyTaskPool, ProxyTaskPool>();
         services.AddTransient<ICommandBinder<ProxyCommandParams>, ProxyCommand.ProxyParamsBinder>();
         services.AddTransient<IProxyCommandHandler, ProxyCommandHandler>();
 
-        //services.AddTransient(provider => provider.ResoleWith<ProxyStream>());
-
-
         return services;
-    }
-
-    private static T ResoleWith<T>(this IServiceProvider provider, params object[] args)
-    {
-        return ActivatorUtilities.CreateInstance<T>(provider, typeof(T), args);
     }
 }

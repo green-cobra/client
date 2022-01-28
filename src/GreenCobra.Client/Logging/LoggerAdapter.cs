@@ -1,38 +1,24 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using GreenCobra.Client.Logging.States;
+using Microsoft.Extensions.Logging;
 
 namespace GreenCobra.Client.Logging;
 
-// todo: maybe should use ILogger<>
-public class LoggerAdapter<TLoggerCategory, TState> : ILoggerAdapter<TLoggerCategory, TState>
+public class LoggerAdapter<TLoggerCategory> : ILoggerAdapter<TLoggerCategory>
 {
     private readonly ILogger<TLoggerCategory> _logger;
-    private readonly ILoggerFormatter<TState> _formatter;
 
-    public LoggerAdapter(ILogger<TLoggerCategory> logger, ILoggerFormatter<TState> formatter)
+    public LoggerAdapter(ILogger<TLoggerCategory> logger)
     {
         _logger = logger;
-        _formatter = formatter;
     }
 
-    public void LogInformation(EventIds eventId, TState state, Exception? exception = null)
+    public void LogInformation<TState>(TState state)
+    where TState : IState, IStateFormatter<TState>
     {
-        Log(LogLevel.Information, eventId, state, exception);
+        if (!_logger.IsEnabled(LogLevel.Information)) return;
+
+        var logEvent = new EventId((int)state.EventId, state.EventId.ToString());
+        
+        _logger.Log(LogLevel.Information, logEvent, state, null, state.Formatter);
     }
-
-    public void Log(LogLevel logLevel, EventIds eventId, TState state, Exception? exception)
-    {
-        if (!_logger.IsEnabled(logLevel))
-            return;
-
-        var loggerEventId = new EventId((int) eventId, eventId.ToString());
-        //LoggerMessage.De
-        //var message = 
-        _logger.Log(logLevel, loggerEventId, state, exception,
-            (s, ex) => _formatter.FormatOutput(s, ex));
-    }
-}
-
-public interface ILoggerAdapter<TLoggerCategory, in TState>
-{
-    void LogInformation(EventIds eventId, TState state, Exception? exception = null);
 }

@@ -44,7 +44,8 @@ public class ProxyStream : IDisposable
                     EventId = LoggingEventId.ProxyStream_DataProxied,
                     Data = valuableBytes,
                     From = _socket.RemoteEndPoint,
-                    To = destination.DestinationEndPoint
+                    To = destination.DestinationEndPoint,
+                    //TaskId = Task.CurrentId.Value
                 });
             }
         }

@@ -10,8 +10,10 @@ public class ProxyStreamState : IState, IStateFormatter<ProxyStreamState>
     public byte[] Data { get; set; }
     public int Length => Data.Length;
 
+    public int TaskId { get; set; }
+
     public Func<ProxyStreamState, Exception?, string>? Formatter { get; } = (state, exception) =>
-    {
-        return $"{state.From} ===> {state.To}:\r\nProxied {state.Length}.";
-    };
+        $"{{Request ID: {state.TaskId, 10}}} " +
+        $"Proxied: {state.From} =====> {state.To} " +
+        $"{{{state.Length} bytes}}\r\n";
 }

@@ -14,6 +14,7 @@ public class ConfigurationState : IState, IStateFormatter<ConfigurationState>
                $"Maximum connections: {state.ConnectionConfiguration.MaxConnections}\r\n" +
                $"Server URL: {state.ConnectionConfiguration.ServerUrl}\r\n" +
                $"Server domain: {state.ConnectionConfiguration.Domain}\r\n" +
-               $"Server port: {state.ConnectionConfiguration.ServerPort}";
+               $"Server port: {state.ConnectionConfiguration.ServerPort}\r\n" +
+               $"\r\n";
     };
 }

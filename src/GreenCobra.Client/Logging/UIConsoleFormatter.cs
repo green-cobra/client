@@ -16,24 +16,27 @@ public class UIConsoleFormatter : ConsoleFormatter
     public override void Write<TState>(in LogEntry<TState> logEntry, IExternalScopeProvider scopeProvider, TextWriter textWriter)
     {
         string message = logEntry.Formatter(logEntry.State, logEntry.Exception);
-        //if (logEntry.Exception == null && message == null)
-        //{
-        //    return;
-        //}
-        var messageColor = GetLogLevelConsoleColors(logEntry.LogLevel);
-        var time = TimeOnly.FromDateTime(DateTime.Now);
+        if (logEntry.Exception == null && message == null)
+        {
+            return;
 
-        var builder = new StringBuilder();
-        builder.Append("[");
-        builder.Append(time);
-        builder.Append("] : (");
-        builder.Append(logEntry.EventId.Id);
-        builder.Append(" - ");
-        builder.Append(logEntry.EventId.Name);
-        builder.Append(") : ");
-        builder.AppendLine(message);
+        }
+        //var messageColor = GetLogLevelConsoleColors(logEntry.LogLevel);
+        //var time = GetCurrentTime();
 
-        textWriter.WriteColoredMessage(builder.ToString(), messageColor);
+        //var builder = new StringBuilder();
+        //builder.Append("[");
+        //builder.Append(time);
+        //builder.Append("] : (");
+        //builder.Append(logEntry.EventId.Id);
+        //builder.Append(" - ");
+        //builder.Append(logEntry.EventId.Name);
+        //builder.Append(") : ");
+        //builder.AppendLine(message);
+
+        //textWriter.WriteColoredMessage(builder.ToString(), messageColor);
+
+        textWriter.Write(message);
     }
 
     private ConsoleColor GetLogLevelConsoleColors(LogLevel logLevel)
@@ -51,6 +54,12 @@ public class UIConsoleFormatter : ConsoleFormatter
             LogLevel.None => ConsoleColor.Gray,
             _ => throw new ArgumentOutOfRangeException(nameof(logLevel), logLevel, null)
         };
+    }
+
+    private TimeOnly GetCurrentTime()
+    {
+        // can be configured
+        return TimeOnly.FromDateTime(DateTime.Now);
     }
 }
 

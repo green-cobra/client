@@ -1,6 +1,6 @@
 ﻿using GreenCobra.Client.Commands.Proxy.Configuration;
 
-namespace GreenCobra.Client.Proxy.V2;
+namespace GreenCobra.Client.Commands.Proxy.Services;
 
 public interface IProxyService
 {

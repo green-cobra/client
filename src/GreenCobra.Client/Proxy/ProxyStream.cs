@@ -1,9 +1,9 @@
 ﻿using System.Buffers;
 using System.Net;
 using System.Net.Sockets;
-using GreenCobra.Client.Proxy.V2.Guards;
+using GreenCobra.Client.Helpers;
 
-namespace GreenCobra.Client.Proxy.V2.Proxy;
+namespace GreenCobra.Client.Proxy;
 
 // todo: inherit ProxyStream from Stream
 public class ProxyStream : IDisposable

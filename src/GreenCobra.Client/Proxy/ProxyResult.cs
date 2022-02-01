@@ -1,3 +1,3 @@
-﻿namespace GreenCobra.Client.Proxy.V2;
+﻿namespace GreenCobra.Client.Proxy;
 
 public record ProxyResult(byte[]? ServerMessageHeading, byte[]? ClientMessageHeading);

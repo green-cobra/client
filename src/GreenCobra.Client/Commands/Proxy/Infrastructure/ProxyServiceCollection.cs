@@ -1,7 +1,7 @@
 ﻿using GreenCobra.Client.Commands.Proxy.Configuration;
 using GreenCobra.Client.Commands.Proxy.Handlers;
+using GreenCobra.Client.Commands.Proxy.Services;
 using GreenCobra.Client.Logging;
-using GreenCobra.Client.Proxy.V2;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

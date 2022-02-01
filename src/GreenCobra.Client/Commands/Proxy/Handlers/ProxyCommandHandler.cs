@@ -3,12 +3,11 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Net.Sockets;
 using GreenCobra.Client.Commands.Proxy.Configuration;
+using GreenCobra.Client.Commands.Proxy.Services;
 using GreenCobra.Client.Helpers;
 using GreenCobra.Client.Logging;
 using GreenCobra.Client.Logging.States;
 using GreenCobra.Client.Proxy;
-using GreenCobra.Client.Proxy.V2;
-using GreenCobra.Client.Proxy.V2.Guards;
 
 namespace GreenCobra.Client.Commands.Proxy.Handlers;
 

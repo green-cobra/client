@@ -1,10 +1,11 @@
 ﻿using System.Diagnostics;
 using GreenCobra.Client.Commands.Proxy.Configuration;
+using GreenCobra.Client.Helpers;
 using GreenCobra.Client.Logging;
 using GreenCobra.Client.Logging.States;
-using GreenCobra.Client.Proxy.V2.Guards;
+using GreenCobra.Client.Proxy;
 
-namespace GreenCobra.Client.Proxy.V2;
+namespace GreenCobra.Client.Commands.Proxy.Services;
 
 public class ProxyService : IProxyService
 {

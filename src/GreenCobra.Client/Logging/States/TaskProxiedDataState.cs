@@ -1,6 +1,6 @@
 ﻿using System.Net;
 using System.Text;
-using GreenCobra.Client.Proxy.V2;
+using GreenCobra.Client.Proxy;
 
 namespace GreenCobra.Client.Logging.States;
 

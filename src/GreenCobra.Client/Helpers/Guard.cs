@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace GreenCobra.Client.Proxy.V2.Guards;
+namespace GreenCobra.Client.Helpers;
 
 public static class Guard
 {

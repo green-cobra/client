@@ -1,8 +1,7 @@
 ﻿using System.Net;
-using GreenCobra.Client.Proxy.V2.Guards;
-using GreenCobra.Client.Proxy.V2.Proxy;
+using GreenCobra.Client.Helpers;
 
-namespace GreenCobra.Client.Proxy.V2;
+namespace GreenCobra.Client.Proxy;
 
 public class ProxyConnection
 {

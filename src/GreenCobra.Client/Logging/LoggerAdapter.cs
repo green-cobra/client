@@ -13,7 +13,7 @@ public class LoggerAdapter<TLoggerCategory> : ILoggerAdapter<TLoggerCategory>
     }
 
     public void LogInformation<TState>(TState state)
-    where TState : IState, IStateFormatter<TState>
+        where TState : IState, IStateFormatter<TState>
     {
         if (!_logger.IsEnabled(LogLevel.Information)) return;
 

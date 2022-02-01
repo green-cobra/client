@@ -1,4 +1,5 @@
-﻿using GreenCobra.Client.Commands.Proxy.Configuration;
+﻿using System.Text;
+using GreenCobra.Client.Commands.Proxy.Configuration;
 using GreenCobra.Client.Logging;
 using GreenCobra.Client.Logging.States;
 
@@ -7,14 +8,14 @@ namespace GreenCobra.Client.Proxy;
 public class ProxyTaskPool : IProxyTaskPool
 {
     private readonly ILoggerAdapter<ProxyTaskPool> _logger;
-    private readonly ILoggerAdapter<ProxyStream> _proxyLogger;
+    //private readonly ILoggerAdapter<ProxyStream> _proxyLogger;
 
     public ProxyTaskPool(
-        ILoggerAdapter<ProxyTaskPool> logger, 
-        ILoggerAdapter<ProxyStream> proxyLogger)
+        ILoggerAdapter<ProxyTaskPool> logger//, 
+        /*ILoggerAdapter<ProxyStream> proxyLogger*/)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _proxyLogger = proxyLogger ?? throw new ArgumentNullException(nameof(logger)); ;
+        //_proxyLogger = proxyLogger ?? throw new ArgumentNullException(nameof(logger)); ;
     }
 
     public async Task RunAsync(ProxyConfiguration proxyConfiguration, CancellationToken cancellationToken)
@@ -51,20 +52,31 @@ public class ProxyTaskPool : IProxyTaskPool
             //var state = new ProxyTaskState(Task.CurrentId.Value, "This is Task");
             //using var scope = _logger.BeginScope(state);
 
-            using var clientStream = new ProxyStream(proxyConfig.LocalApplicationEndPoint, _proxyLogger);
-            using var serverStream = new ProxyStream(proxyConfig.ServerEndPoint, _proxyLogger);
+            using var clientStream = new ProxyStream(proxyConfig.ApplicationEndPoint);
+            using var serverStream = new ProxyStream(proxyConfig.ServerEndPoint);
 
-            var serverToClient = serverStream.CopyAsync(clientStream, cancellationToken);
-            var clientToServer = clientStream.CopyAsync(serverStream, cancellationToken);
+            var serverToClientTask = serverStream.CopyAsync(clientStream, cancellationToken);
+            var clientToServerTask = clientStream.CopyAsync(serverStream, cancellationToken);
 
-            await Task.WhenAll(serverToClient, clientToServer);
+            await Task.WhenAll(serverToClientTask, clientToServerTask);
 
-            _logger.LogInformation(new SimpleMessageState
+            //_logger.LogInformation(new TaskProxiedDataState
+            //{
+            //    EventId = LoggingEventId.ProxyStream_DataProxied,
+            //    CorrelationId = clientToServerTask.Id, //clientToServerTask.Id,
+            //    Data = await clientToServerTask,
+            //    From = clientStream.DestinationEndPoint,
+            //    To = serverStream.DestinationEndPoint
+            //});
+
+            _logger.LogInformation(new TaskProxiedDataState
             {
-                EventId = LoggingEventId.ProxyTaskCompleted,
-                Message = $"Proxy completed; TaskId: {Task.CurrentId.Value}"
+                From = clientStream.DestinationEndPoint,
+                To = serverStream.DestinationEndPoint,
+                RequestData = await serverToClientTask,
+                ResponseData = await clientToServerTask
             });
-            //_logger.LogInformation(EventIds.ProxyTaskCompleted, $"Proxy completed; TaskId: {Task.CurrentId.Value}");
+
         }, cancellationToken);
     }
 

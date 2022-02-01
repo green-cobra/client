@@ -6,9 +6,8 @@ public enum LoggingEventId
     Proxy_ConfigurationDone = 10,
 
     // proxying events
-    ProxyTaskCompleted = 100,
-    ProxyStream_DataProxied = 1000,
+    DataProxied = 1000,
 
     // other events
-    PoolWatcher_GotPoolStatus = 5000
+    PoolWatcher_GotPoolStatus = 5000,
 }

@@ -1,36 +1,31 @@
 ﻿using System.Buffers;
 using System.Net;
 using System.Net.Sockets;
-using GreenCobra.Client.Logging;
-using GreenCobra.Client.Logging.States;
 
 namespace GreenCobra.Client.Proxy;
 
+// todo: inherit ProxyStream from Stream
 public class ProxyStream : IDisposable
 {
     public EndPoint? DestinationEndPoint => _socket.RemoteEndPoint;
 
     private readonly Socket _socket;
     private readonly IPEndPoint _endPoint;
-    
-    private readonly ILoggerAdapter<ProxyStream>? _logger;
 
-    public ProxyStream(IPEndPoint endPoint) : this(endPoint, null) { }
+    private readonly int _defaultBufferSize = 32 * 1024;
 
-    public ProxyStream(IPEndPoint endPoint, ILoggerAdapter<ProxyStream>? logger)
+    public ProxyStream(IPEndPoint endPoint)
     {
         _endPoint = endPoint;
-        _logger = logger;  
         _socket = new(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
     }
 
-    public async Task CopyAsync(ProxyStream destination, CancellationToken cancellationToken)
+    public async Task<byte[]> CopyAsync(ProxyStream destination, CancellationToken cancellationToken)
     {
         await ConnectIfNotConnectedAsync();
-        
-        int bufferSize = 64 * 1024;
-        byte[] buffer = ArrayPool<byte>.Shared.Rent(bufferSize);
 
+        byte[]? messageHeading = null;
+        byte[] buffer = ArrayPool<byte>.Shared.Rent(_defaultBufferSize);
         try
         {
             int bytesRead;
@@ -39,20 +34,15 @@ public class ProxyStream : IDisposable
                 var valuableBytes = buffer[..bytesRead];
                 await destination.WriteAsync(valuableBytes, cancellationToken);
 
-                _logger?.LogInformation(new ProxyStreamState
-                {
-                    EventId = LoggingEventId.ProxyStream_DataProxied,
-                    Data = valuableBytes,
-                    From = _socket.RemoteEndPoint,
-                    To = destination.DestinationEndPoint,
-                    //TaskId = Task.CurrentId.Value
-                });
+                messageHeading ??= valuableBytes;
             }
         }
         finally
         {
             ArrayPool<byte>.Shared.Return(buffer);
         }
+
+        return messageHeading;
     }
 
     private async Task ConnectIfNotConnectedAsync()

@@ -4,5 +4,5 @@ namespace GreenCobra.Client.Commands.Proxy.Configuration;
 
 public record ProxyConfiguration(
     IPEndPoint ServerEndPoint,
-    IPEndPoint ApplicationEndPoint,
+    IPEndPoint ClientEndPoint,
     int MaxConnections);

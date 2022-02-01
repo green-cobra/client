@@ -7,6 +7,8 @@ using GreenCobra.Client.Helpers;
 using GreenCobra.Client.Logging;
 using GreenCobra.Client.Logging.States;
 using GreenCobra.Client.Proxy;
+using GreenCobra.Client.Proxy.V2;
+using GreenCobra.Client.Proxy.V2.Guards;
 
 namespace GreenCobra.Client.Commands.Proxy.Handlers;
 
@@ -14,17 +16,20 @@ public class ProxyCommandHandler : IProxyCommandHandler
 {
     private readonly ICommandBinder<ProxyCommandParams> _paramsBinder;
     private readonly ILoggerAdapter<ProxyCommandHandler> _logger;
-
-    private readonly IProxyTaskPool _proxyTaskPool;
+    private readonly IProxyService _proxyService;
 
     public ProxyCommandHandler(
         ICommandBinder<ProxyCommandParams> paramsBinder,
-        IProxyTaskPool proxyTaskPool,
-        ILoggerAdapter<ProxyCommandHandler> logger)
+        ILoggerAdapter<ProxyCommandHandler> logger,
+        IProxyService proxyService)
     {
-        _paramsBinder = paramsBinder ?? throw new ArgumentNullException(nameof(paramsBinder));
-        _proxyTaskPool = proxyTaskPool ?? throw new ArgumentNullException(nameof(proxyTaskPool));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        Guard.AgainstNull(paramsBinder);
+        Guard.AgainstNull(logger);
+        Guard.AgainstNull(proxyService);
+
+        _paramsBinder = paramsBinder;
+        _logger = logger;
+        _proxyService = proxyService;
     }
 
     public async Task<int> InvokeAsync(InvocationContext context)
@@ -49,7 +54,7 @@ public class ProxyCommandHandler : IProxyCommandHandler
         });
 
         // wait until app will not be closed
-        await _proxyTaskPool.RunAsync(proxyConfig, cancellationToken);
+        await _proxyService.StartProxyAsync(proxyConfig, cancellationToken);
 
         return context.ExitCode;
     }

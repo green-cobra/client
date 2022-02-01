@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Text;
+using GreenCobra.Client.Proxy.V2;
 
 namespace GreenCobra.Client.Logging.States;
 
@@ -7,30 +8,24 @@ public class TaskProxiedDataState : IState, IStateFormatter<TaskProxiedDataState
 {
     public LoggingEventId EventId { get; set; } = LoggingEventId.DataProxied;
 
-    public EndPoint From { get; set; }
-    public EndPoint To { get; set; }
+    public EndPoint ServerEndPoint { get; set; }
+    public EndPoint ClientEndPoint { get; set; }
     //public string RequestUrl { get; set; }
-    public byte[] RequestData { get; set; }
-    public byte[] ResponseData { get; set; }
-    //public int Length => Data.Length;
+    public ProxyResult ProxyResult { get; set; }
     //public int CorrelationId { get; set; }
 
-    //public Func<TaskProxiedDataState, Exception?, string>? Formatter { get; } = (state, exception) =>
-    //    $"{{Request ID: {state.CorrelationId, 5}}} " +
-    //    $"Proxied: {state.From, 25} =====> {state.To, 25} " +
-    //    $"{{{state.Length, 10} bytes}}\r\n";
     public Func<TaskProxiedDataState, Exception?, string>? Formatter { get; } = (state, exception) =>
     {
-        var requestHeaders = ConvertBytesToString(state.RequestData);
-        var responseHeaders = ConvertBytesToString(state.ResponseData);
+        var requestHeaders = ConvertBytesToString(state.ProxyResult.ServerMessageHeading);
+        var responseHeaders = ConvertBytesToString(state.ProxyResult.ClientMessageHeading);
 
 
-        return $"Proxied: {state.From} <=====> {state.To} \r\n" +
+        return $"Proxied: {state.ServerEndPoint} <=====> {state.ClientEndPoint} \r\n" +
                $" - Request : {ParseHttp(requestHeaders)}\r\n" +
                $" - Response: {ParseHttp(responseHeaders)}\r\n";
     };
 
-    private static string ConvertBytesToString(byte[] bytes)
+    private static string ConvertBytesToString(byte[]? bytes)
     {
         var dataAsString = Encoding.UTF8.GetString(bytes);
 

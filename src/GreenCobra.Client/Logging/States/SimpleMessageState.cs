@@ -1,9 +1,9 @@
-﻿namespace GreenCobra.Client.Logging.States;
+﻿using GreenCobra.Client.Logging.States.Interfaces;
 
-public class SimpleMessageState : IState, IStateFormatter<SimpleMessageState>
+namespace GreenCobra.Client.Logging.States;
+
+public record SimpleMessageState(LoggingEventId EventId, string Message)
+    : IState, IStateFormatter<SimpleMessageState>
 {
-    public LoggingEventId EventId { get; set; }
-    public string Message { get; set; }
-
-    public Func<SimpleMessageState, Exception?, string>? Formatter { get; } = (state, ex) => state.Message;
+    public Func<SimpleMessageState, Exception?, string> Formatter { get; } = (state, ex) => state.Message;
 }

@@ -1,6 +1,6 @@
-﻿using GreenCobra.Client.Logging.States;
+﻿using GreenCobra.Client.Logging.States.Interfaces;
 
-namespace GreenCobra.Client.Logging;
+namespace GreenCobra.Client.Logging.Adapters;
 
 public interface ILoggerAdapter<TLoggerCategory>
 {

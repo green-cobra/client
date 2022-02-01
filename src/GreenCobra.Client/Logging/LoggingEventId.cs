@@ -6,8 +6,5 @@ public enum LoggingEventId
     GotServerConfiguration = 10,
 
     // proxying events
-    DataProxied = 1000,
-
-    // other events
-    PoolWatcher_GotPoolStatus = 5000,
+    DataProxied = 1000
 }

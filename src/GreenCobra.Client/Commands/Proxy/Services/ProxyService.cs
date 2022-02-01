@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using GreenCobra.Client.Commands.Proxy.Configuration;
 using GreenCobra.Client.Helpers;
-using GreenCobra.Client.Logging;
+using GreenCobra.Client.Logging.Adapters;
 using GreenCobra.Client.Logging.States;
 using GreenCobra.Client.Proxy;
 
@@ -37,12 +37,7 @@ public class ProxyService : IProxyService
                     var proxyResult = await completedTask;
 
                     // todo: logging
-                    _logger.LogInformation(new TaskProxiedDataState
-                    {
-                        ServerEndPoint = configuration.ServerEndPoint,
-                        ClientEndPoint = configuration.ClientEndPoint,
-                        ProxyResult = proxyResult
-                    });
+                    _logger.LogInformation(new TaskProxiedDataState(configuration, proxyResult));
 
                     break;
                 case {Status: TaskStatus.Canceled}:

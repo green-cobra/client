@@ -4,7 +4,7 @@ using System.Net.Sockets;
 using GreenCobra.Client.Commands.Proxy.Configuration;
 using GreenCobra.Client.Helpers;
 using GreenCobra.Client.Infrastructure.ServerCommunication.Models;
-using GreenCobra.Client.Logging;
+using GreenCobra.Client.Logging.Adapters;
 using GreenCobra.Client.Logging.States;
 
 namespace GreenCobra.Client.Infrastructure.ServerCommunication;
@@ -38,11 +38,7 @@ public class ServerCommunicationService : IServerCommunicationService
             commandParams.ApplicationEndPoint,
             proxyServerConfig!.MaxConnections);
 
-        _logger.LogInformation(new GotProxyConfigurationState
-        {
-            ProxyConfiguration = proxyConfig,
-            ServerUrl = commandParams.ServerUrl
-        });
+        _logger.LogInformation(new GotProxyConfigurationState(proxyConfig, commandParams.ServerUrl));
 
         return proxyConfig;
     }
@@ -50,7 +46,7 @@ public class ServerCommunicationService : IServerCommunicationService
     private static void ValidateProxyServerConfiguration(ProxyServerConfigurationDto? proxyServerConfig)
     {
         Guard.AgainstNull(proxyServerConfig);
-        Guard.AgainstNull(proxyServerConfig.ServerUrl);
+        Guard.AgainstNull(proxyServerConfig!.ServerUrl);
         Guard.AgainstNull(proxyServerConfig.Domain);
     }
 

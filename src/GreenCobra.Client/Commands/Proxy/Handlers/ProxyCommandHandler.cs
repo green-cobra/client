@@ -3,7 +3,7 @@ using GreenCobra.Client.Commands.Proxy.Configuration;
 using GreenCobra.Client.Commands.Proxy.Services;
 using GreenCobra.Client.Helpers;
 using GreenCobra.Client.Infrastructure.ServerCommunication;
-using GreenCobra.Client.Logging;
+using GreenCobra.Client.Logging.Adapters;
 
 namespace GreenCobra.Client.Commands.Proxy.Handlers;
 

@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Logging.Console;
 
-namespace GreenCobra.Client.Logging;
+namespace GreenCobra.Client.Logging.Formatters;
 
 public class UIConsoleFormatter : ConsoleFormatter
 {

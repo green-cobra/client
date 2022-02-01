@@ -1,26 +1,22 @@
-﻿using System.Net;
-using System.Text;
+﻿using System.Text;
+using GreenCobra.Client.Commands.Proxy.Configuration;
+using GreenCobra.Client.Logging.States.Interfaces;
 using GreenCobra.Client.Proxy;
 
 namespace GreenCobra.Client.Logging.States;
 
-public class TaskProxiedDataState : IState, IStateFormatter<TaskProxiedDataState>
+public record TaskProxiedDataState(ProxyConfiguration ProxyConfiguration, ProxyResult ProxyResult)
+    : IState, IStateFormatter<TaskProxiedDataState>
 {
     public LoggingEventId EventId => LoggingEventId.DataProxied;
 
-    public EndPoint ServerEndPoint { get; set; }
-    public EndPoint ClientEndPoint { get; set; }
-    //public string RequestUrl { get; set; }
-    public ProxyResult ProxyResult { get; set; }
-    //public int CorrelationId { get; set; }
-
-    public Func<TaskProxiedDataState, Exception?, string>? Formatter { get; } = (state, exception) =>
+    public Func<TaskProxiedDataState, Exception?, string> Formatter { get; } = (state, ex) =>
     {
         var requestHeaders = ConvertBytesToString(state.ProxyResult.ServerMessageHeading);
         var responseHeaders = ConvertBytesToString(state.ProxyResult.ClientMessageHeading);
 
 
-        return $"Proxied: {state.ServerEndPoint} <=====> {state.ClientEndPoint} \r\n" +
+        return $"Proxied: {state.ProxyConfiguration.ServerEndPoint} <=====> {state.ProxyConfiguration.ClientEndPoint} \r\n" +
                $" - Request : {ParseHttp(requestHeaders)}\r\n" +
                $" - Response: {ParseHttp(responseHeaders)}\r\n";
     };

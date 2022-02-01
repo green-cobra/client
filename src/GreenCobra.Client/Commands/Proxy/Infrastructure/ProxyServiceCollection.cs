@@ -1,6 +1,7 @@
 ﻿using GreenCobra.Client.Commands.Proxy.Configuration;
 using GreenCobra.Client.Commands.Proxy.Handlers;
 using GreenCobra.Client.Commands.Proxy.Services;
+using GreenCobra.Client.Infrastructure.ServerCommunication;
 using GreenCobra.Client.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -49,6 +50,7 @@ public static class ProxyServiceCollection
         services.AddTransient<ICommandBinder<ProxyCommandParams>, ProxyCommand.ProxyParamsBinder>();
         services.AddTransient<IProxyCommandHandler, ProxyCommandHandler>();
 
+        services.AddTransient<IServerCommunicationService, ServerCommunicationService>();
         services.AddTransient<IProxyService, ProxyService>();
 
         return services;

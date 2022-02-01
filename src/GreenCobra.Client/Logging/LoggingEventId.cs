@@ -3,7 +3,7 @@
 public enum LoggingEventId
 {
     // config events
-    Proxy_ConfigurationDone = 10,
+    GotServerConfiguration = 10,
 
     // proxying events
     DataProxied = 1000,

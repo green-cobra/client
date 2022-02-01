@@ -3,5 +3,5 @@
 // to be able to use JsonConsoleFormatter new to override .ToString()
 public interface IState
 {
-    public LoggingEventId EventId { get; set; }
+    public LoggingEventId EventId { get; }
 }

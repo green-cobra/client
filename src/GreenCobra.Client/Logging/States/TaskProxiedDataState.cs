@@ -6,7 +6,7 @@ namespace GreenCobra.Client.Logging.States;
 
 public class TaskProxiedDataState : IState, IStateFormatter<TaskProxiedDataState>
 {
-    public LoggingEventId EventId { get; set; } = LoggingEventId.DataProxied;
+    public LoggingEventId EventId => LoggingEventId.DataProxied;
 
     public EndPoint ServerEndPoint { get; set; }
     public EndPoint ClientEndPoint { get; set; }

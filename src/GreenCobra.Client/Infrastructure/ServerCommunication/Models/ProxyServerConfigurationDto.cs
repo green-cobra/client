@@ -1,8 +1,8 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace GreenCobra.Client.Commands.Proxy.Configuration;
+namespace GreenCobra.Client.Infrastructure.ServerCommunication.Models;
 
-public record ProxyServerConfiguration(
+public record ProxyServerConfigurationDto(
     [property: JsonPropertyName("id")] string Domain,
     [property: JsonPropertyName("max_conn_count")] int MaxConnections,
     [property: JsonPropertyName("port")] int ServerPort,

@@ -1,0 +1,8 @@
+{
+  "ProxyOptions": {
+    "LocalHost": "127.0.0.1",
+    "LocalPort": "80",
+    "ServerUrl": "https://localtunnel.me/",
+    "ServerDomainRequest": "?new"
+  }
+}

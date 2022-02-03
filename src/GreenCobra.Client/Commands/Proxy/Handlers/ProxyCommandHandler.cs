@@ -2,6 +2,7 @@
 using GreenCobra.Client.Commands.Proxy.Configuration;
 using GreenCobra.Client.Commands.Proxy.Services;
 using GreenCobra.Client.Helpers;
+using GreenCobra.Client.Infrastructure;
 using GreenCobra.Client.Infrastructure.ServerCommunication;
 using GreenCobra.Client.Logging.Adapters;
 

@@ -7,7 +7,7 @@ string[] commandParams;
 commandParams = new[]
 {
     $"green-cobra proxy " +
-    $"--remote-domain-request green-cobra-7576 " +
+    $"--server-domain-request green-cobra-7576 " +
     $"--local-port 57679 "
 };
 #else

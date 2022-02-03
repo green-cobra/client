@@ -3,8 +3,9 @@ using System.CommandLine.Binding;
 using System.Net;
 using GreenCobra.Client.Commands.Proxy.Configuration;
 using GreenCobra.Client.Commands.Proxy.Handlers;
-using GreenCobra.Client.Commands.Proxy.Infrastructure;
-using Microsoft.Extensions.DependencyInjection;
+using GreenCobra.Client.Configuration;
+using GreenCobra.Client.Infrastructure;
+using Microsoft.Extensions.Options;
 
 namespace GreenCobra.Client.Commands.Proxy;
 
@@ -14,6 +15,8 @@ public class ProxyCommand : Command
     private new const string Description = "Proxy requests from public server to your locally running application";
 
     private const string StubDescription = "COMING SOON!";
+
+    private readonly ProxyOptions _proxyOptions;
 
     #region Options
 
@@ -35,24 +38,25 @@ public class ProxyCommand : Command
     //    getDefaultValue: () => new Uri($"{_localPortOption.}"));
 
     private static readonly Option<Uri> RemoteUrlOption = new(
-        aliases: new[] {"--remote-url", "-s"},
+        aliases: new[] {"--server-url", "-s"},
         description: StubDescription,
         getDefaultValue: () => new Uri("https://localtunnel.me/"));
 
     private const string RemoteDomainDefault = "?new";
     private static readonly Option<string> RemoteDomainOption = new(
-        aliases: new[] {"--remote-domain-request", "-d"},
+        aliases: new[] {"--server-domain-request", "-d"},
         description: StubDescription,
         getDefaultValue: () => RemoteDomainDefault); // todo: maybe we will use enum here (/green-cobra-733)
 
     #endregion
 
-    public ProxyCommand() :base(Name, Description)
+    public ProxyCommand(IOptions<ProxyOptions> defaultOptions) :base(Name, Description)
     {
+        _proxyOptions = defaultOptions.Value;
+
         AddOptions();
 
-        var serviceProvider = ProxyServiceCollection.BuildServices();        
-        Handler = serviceProvider.GetRequiredService<IProxyCommandHandler>();
+        Handler = AppServiceCollection.GetService<IProxyCommandHandler>();
     }
 
     // Adds options for this command
@@ -86,9 +90,4 @@ public class ProxyCommand : Command
             );
         }
     }
-}
-
-public interface ICommandBinder<out T>
-{
-    public T BindParametersFromContext(BindingContext bindingContext);
 }

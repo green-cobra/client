@@ -36,15 +36,15 @@ public static class ProxyServiceCollection
         {
             builder.AddConfiguration(configuration.GetSection("Logging"));
             // todo: later this should be configured by profile
-#if DEBUG
+//#if DEBUG
             builder.AddConsoleFormatter<UIConsoleFormatter, ConsoleFormatterOptions>();
             builder.AddConsole(options =>
             {
                 options.FormatterName = "ConsoleUi";
             });
-#else
-            builder.AddSimpleConsole();
-#endif
+//#else
+//            builder.AddSimpleConsole();
+//#endif
         });
 
         services.AddTransient(typeof(ILoggerAdapter<>), typeof(LoggerAdapter<>));

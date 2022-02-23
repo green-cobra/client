@@ -1,24 +1,19 @@
-﻿using GreenCobra.Client.Logging.States;
-using Microsoft.Extensions.Logging;
+﻿using System.CommandLine;
+using GreenCobra.Client.Logging.States;
 
 namespace GreenCobra.Client.Logging;
 
-public class LoggerAdapter<TLoggerCategory> : ILoggerAdapter<TLoggerCategory>
+public class LoggerAdapter
 {
-    private readonly ILogger<TLoggerCategory> _logger;
+    private readonly IConsole _console;
 
-    public LoggerAdapter(ILogger<TLoggerCategory> logger)
+    public LoggerAdapter(IConsole console)
     {
-        _logger = logger;
+        _console = console;
     }
 
-    public void LogInformation<TState>(TState state)
-        where TState : IState, IStateFormatter<TState>
+    public void Log(ILoggerState state)
     {
-        if (!_logger.IsEnabled(LogLevel.Information)) return;
-
-        var logEvent = new EventId((int)state.EventId, state.EventId.ToString());
-        
-        _logger.Log(LogLevel.Information, logEvent, state, null, state.Formatter);
+        _console.WriteLine(state.Format());
     }
 }

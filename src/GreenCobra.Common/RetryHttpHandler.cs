@@ -1,8 +1,7 @@
-﻿namespace GreenCobra.Client.Helpers;
+﻿namespace GreenCobra.Common;
 
 public class RetryHttpHandler : DelegatingHandler
 {
-    // todo: put to config
     private readonly int _maxRetries = 3;
 
     public RetryHttpHandler() : base(new HttpClientHandler()) { }

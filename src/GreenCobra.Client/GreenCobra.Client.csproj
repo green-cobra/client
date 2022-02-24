@@ -7,18 +7,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 
-	<!--<IsPackable>true</IsPackable>
-	<PackAsTool>true</PackAsTool>
-	<PackageId>green-cobra</PackageId>
-	<ToolCommandName>green-cobra</ToolCommandName>
-	<PackAsToolShimRuntimeIdentifiers>win-x64;osx-x64;linux-x64</PackAsToolShimRuntimeIdentifiers>
-	<PackagedShimOutputRootDirectory>$(OutputPath)</PackagedShimOutputRootDirectory>-->
-	  
-	<!--<IsPublishable>true</IsPublishable>-->
-<!--	<RuntimeIdentifiers>win10-x64;osx-x64;linux-x64</RuntimeIdentifiers>-->
-
-	<!--<PublishTrimmed>true</PublishTrimmed>-->
-	<!--<SelfContained>true</SelfContained>-->
+    <AssemblyName>green-cobra</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

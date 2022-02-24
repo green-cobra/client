@@ -24,12 +24,11 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore
-    
     - name: Publish
       run: | 
-        dotnet publish -p:PublishProfile=WindowsProfile -c Release 
-        dotnet publish -p:PublishProfile=LinuxProfile -c Release 
-        dotnet publish -p:PublishProfile=OsxProfile -c Release 
+        dotnet publish -p:PublishProfile=WindowsProfile -c Release -p:DebugSymbols=false -p:DebugType=None
+        dotnet publish -p:PublishProfile=LinuxProfile -c Release -p:DebugSymbols=false -p:DebugType=None
+        dotnet publish -p:PublishProfile=OsxProfile -c Release -p:DebugSymbols=false -p:DebugType=None
       
     - name: Release
       uses: softprops/action-gh-release@v1
@@ -37,6 +36,4 @@ jobs:
       with:
         generate_release_notes: true
         files: |
-          src/GreenCobra.Client/bin/Release/win-x64/publish/green-cobra-windows.exe
-          src/GreenCobra.Client/bin/Release/linux-x64/publish/green-cobra-linux
-          src/GreenCobra.Client/bin/Release/osx-x64/publish/green-cobra-osx
+          src/GreenCobra.Client/bin/Release/*/publish/*

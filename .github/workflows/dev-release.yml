@@ -1,0 +1,38 @@
+name: dev-release
+
+permissions:
+  contents: write
+
+on:
+  create:
+    tags:
+      - v*
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        os: [win, linux, osx]
+        arch: [arm64, x64]
+        #include: 
+        #  - os: linux
+        #    arch: x86
+    
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Call composite Action build single file
+        uses: ./.github/actions/build-dot-net-single-file
+        with:
+          os: ${{ matrix.os }}
+          arch: ${{ matrix.arch }}
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          generate_release_notes: true
+          files: src/GreenCobra.Client/bin/Release/*/*/publish/green-cobra-*

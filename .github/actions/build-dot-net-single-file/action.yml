@@ -1,0 +1,33 @@
+name: build-dot-net-single-file
+description: 'Builds and Publishes production ready DotNet 6 application using single file build'
+
+inputs: 
+  os:
+    required: true
+  arch:
+    required: true
+
+runs:
+  using: "composite"
+
+  steps:
+    - name: Setup .NET 6
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '6.0.x'
+        
+    - name: Restore Dependencies
+      shell: bash
+      run: dotnet restore
+  
+    - name: Build & Publish
+      shell: bash
+      run: |
+        dotnet build -c Release --no-restore
+        dotnet publish -c Release -r ${{ inputs.os }}-${{ inputs.arch }} --sc -p:DebugSymbols=false -p:DebugType=None
+              
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ inputs.os }}-${{ inputs.arch }}
+        path: ./src/GreenCobra.Client/bin/Release/net6.0/${{ inputs.os }}-${{ inputs.arch }}/publish/

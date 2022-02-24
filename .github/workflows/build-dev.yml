@@ -1,0 +1,24 @@
+name: build-dev
+
+on:
+  push:
+    branches: [ development ]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix: 
+        os: [win, linux]
+        arch: [x64]
+        
+    steps:
+      - name: Checkout repo 
+        uses: actions/checkout@v2
+
+      - name: Call composite Action build single file
+        uses: ./.github/actions/build-dot-net-single-file
+        with: 
+          os: ${{ matrix.os }}
+          arch: ${{ matrix.arch }}

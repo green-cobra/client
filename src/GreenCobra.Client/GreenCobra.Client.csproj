@@ -7,20 +7,14 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 
-	<!--<IsPackable>true</IsPackable>
-	<PackAsTool>true</PackAsTool>
-	<PackageId>green-cobra</PackageId>
-	<ToolCommandName>green-cobra</ToolCommandName>
-	<PackAsToolShimRuntimeIdentifiers>win-x64;osx-x64;linux-x64</PackAsToolShimRuntimeIdentifiers>
-	<PackagedShimOutputRootDirectory>$(OutputPath)</PackagedShimOutputRootDirectory>-->
-	  
-	<!--<IsPublishable>true</IsPublishable>-->
-<!--	<RuntimeIdentifiers>win10-x64;osx-x64;linux-x64</RuntimeIdentifiers>-->
-
-	<!--<PublishTrimmed>true</PublishTrimmed>-->
-	<!--<SelfContained>true</SelfContained>-->
+    <!-- Publish related configuration -->
+    <PublishTrimmed>true</PublishTrimmed>
+    <SuppressTrimAnalysisWarnings>true</SuppressTrimAnalysisWarnings>
+    <PublishSingleFile>true</PublishSingleFile>
+    
+    <AssemblyName Condition="'$(RuntimeIdentifier)' != '' ">green-cobra-$(RuntimeIdentifier)</AssemblyName>
   </PropertyGroup>
-
+  
   <ItemGroup>
     <PackageReference Include="system.commandline" Version="2.0.0-beta2.21617.1" />
   </ItemGroup>
@@ -30,8 +24,12 @@
     <ProjectReference Include="..\GreenCobra.Proxy\GreenCobra.Proxy.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Resource Include="Properties\PublishProfiles\WindowsProfile.pubxml" />
-  </ItemGroup>
-
+<!--    Languages can be trimmed using-->
+<!--    <SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>-->
+<!--  <Target Name="ZipOutputPath" AfterTargets="Build">-->
+<!--    <Message Text="RI =>; $(RuntimeIdentifier)" Importance="high"/>-->
+<!--    <Message Text="OutputPath => $(OutputPath)" Importance="high"/>-->
+<!--    <Message Text="PublishDir => $(PublishDir)" Importance="high"/>-->
+<!--    <Message Text="MSBuildProjectDirectory => $(MSBuildProjectDirectory)" Importance="high"/>-->
+<!--  </Target>-->
 </Project>

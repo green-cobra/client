@@ -32,4 +32,4 @@ jobs:
       with:
         generate_release_notes: true
         files: |
-          src/GreenCobra.Client/bin/Release/win-x64/publish\/GreenCobra.Client.exe
+          src/GreenCobra.Client/bin/Release/*

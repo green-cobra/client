@@ -6,7 +6,9 @@ permissions:
 on:
   push:
     branches: [ development ]
-
+  create:
+    tags:
+      - v*
 jobs:
   build:
 

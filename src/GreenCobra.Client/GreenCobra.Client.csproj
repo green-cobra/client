@@ -31,6 +31,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Properties\PublishProfiles\LinuxProfile.pubxml" />
+    <Resource Include="Properties\PublishProfiles\OsxProfile.pubxml" />
     <Resource Include="Properties\PublishProfiles\WindowsProfile.pubxml" />
   </ItemGroup>
 

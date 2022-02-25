@@ -4,20 +4,41 @@ on:
   push:
     branches: [ development ]
 
+env:
+  ARTIFACTS_PATH: './src/GreenCobra.Client/bin/Release/net6.0/*/publish/'
+  DOTNET_VERSION: '6.0.x'
+
 jobs:
-  build:
-    uses: ./.github/workflows/dotnet-publish.yml
-    with:
-      rid: win-x64
-        
-  upload-artifacts:
+  publish:
     runs-on: ubuntu-latest
-    needs: build
+    
+    strategy:
+      matrix: 
+        os: [win, linux, osx]
+        arch: [arm, x64, x32]
+        
     steps:
+      - uses: actions/checkout@v2
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+          
+      - name: Restore Dependencies
+        run: dotnet restore
+        
+      - name: Build 
+        run: |
+          dotnet build -c Release --no-restore
+          dotnet publish 
+            -c Release -r ${{ matrix.os }}-${{ matrix.arch }} 
+            --sc -p:DebugSymbols=false -p:DebugType=None
+
+      - name: Display structure of artifacts
+        run: ls -R
+        
       - name: Upload Artifacts
         uses: actions/upload-artifact@v2
         with:
           name: my-artifact
-          path: "./"
-      - name: Display structure of files
-        run: ls -R
+          path: ${{ env.ARTIFACTS_PATH }}

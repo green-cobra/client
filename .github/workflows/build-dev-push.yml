@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    uses: ./.github/actions/dotnet-publish/action.yml
+    uses: ./.github/actions/dotnet-publish
     with:
       rid: win-x64
     

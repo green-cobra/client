@@ -6,9 +6,15 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    
-  </PropertyGroup>
 
+    <!-- Publish related configuration -->
+    <PublishTrimmed>true</PublishTrimmed>
+    <SuppressTrimAnalysisWarnings>true</SuppressTrimAnalysisWarnings>
+    <PublishSingleFile>true</PublishSingleFile>
+    
+    <AssemblyName Condition="$(RuntimeIdentifier) != null">green-cobra-$(RuntimeIdentifier)</AssemblyName>
+  </PropertyGroup>
+  
   <ItemGroup>
     <PackageReference Include="system.commandline" Version="2.0.0-beta2.21617.1" />
   </ItemGroup>
@@ -18,10 +24,12 @@
     <ProjectReference Include="..\GreenCobra.Proxy\GreenCobra.Proxy.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Resource Include="Properties\PublishProfiles\LinuxProfile.pubxml" />
-    <Resource Include="Properties\PublishProfiles\OsxProfile.pubxml" />
-    <Resource Include="Properties\PublishProfiles\WindowsProfile.pubxml" />
-  </ItemGroup>
-
+<!--    Languages can be trimmed using-->
+<!--    <SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>-->
+<!--  <Target Name="ZipOutputPath" AfterTargets="Build">-->
+<!--    <Message Text="RI =>; $(RuntimeIdentifier)" Importance="high"/>-->
+<!--    <Message Text="OutputPath => $(OutputPath)" Importance="high"/>-->
+<!--    <Message Text="PublishDir => $(PublishDir)" Importance="high"/>-->
+<!--    <Message Text="MSBuildProjectDirectory => $(MSBuildProjectDirectory)" Importance="high"/>-->
+<!--  </Target>-->
 </Project>

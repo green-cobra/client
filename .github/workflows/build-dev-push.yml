@@ -1,0 +1,17 @@
+name: build-dev-push
+
+on:
+  push:
+    branches: [ development ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Publish .NET
+      uses: ./.github/actions/dotnet-publish
+      with:
+        rid: win-x64

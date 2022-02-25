@@ -12,7 +12,7 @@
     <SuppressTrimAnalysisWarnings>true</SuppressTrimAnalysisWarnings>
     <PublishSingleFile>true</PublishSingleFile>
     
-    <AssemblyName Condition="$(RuntimeIdentifier) != null">green-cobra-$(RuntimeIdentifier)</AssemblyName>
+    <AssemblyName Condition="'$(RuntimeIdentifier)' != '' ">green-cobra-$(RuntimeIdentifier)</AssemblyName>
   </PropertyGroup>
   
   <ItemGroup>

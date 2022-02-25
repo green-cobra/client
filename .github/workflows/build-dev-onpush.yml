@@ -41,5 +41,5 @@ jobs:
       - name: Upload Artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: my-artifact
-          path: ${{ env.ARTIFACTS_PATH }}
+          name: ${{ matrix.os }}-${{ matrix.arch }}
+          path: ./src/GreenCobra.Client/bin/Release/net6.0/${{ matrix.os }}-${{ matrix.arch }}/publish/

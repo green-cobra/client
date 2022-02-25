@@ -1,4 +1,4 @@
-name: publish
+name: dotnet-publish
 
 on:
   workflow_call:

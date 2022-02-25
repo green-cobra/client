@@ -22,3 +22,6 @@ jobs:
         run: dotnet build -c Release --no-restore
       - name: Publish
         run: dotnet publish -r ${{ inputs.rid }} -c Release --sc -p:DebugSymbols=false -p:DebugType=None
+
+      - name: Display structure of files
+        run: ls -R

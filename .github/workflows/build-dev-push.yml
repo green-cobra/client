@@ -12,6 +12,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Publish .NET
-      uses: ./.github/actions/dotnet-publish
+      uses: ./.github/actions/dotnet-publish.yml
       with:
         rid: win-x64

@@ -24,7 +24,7 @@ runs:
       shell: bash
       run: |
         dotnet build -c Release --no-restore
-        dotnet publish -c Release -os ${{ inputs.os }} -a ${{ inputs.arch }} --sc -p:DebugSymbols=false -p:DebugType=None
+        dotnet publish -c Release -r ${{ inputs.os }}-${{ inputs.arch }} --sc -p:DebugSymbols=false -p:DebugType=None
         
 #        echo "::set-output name=artifactsPath::$()"
   

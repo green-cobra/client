@@ -24,7 +24,7 @@ runs:
       shell: bash
       run: |
         dotnet build -c Release --no-restore
-        dotnet publish -c Release -os ${{ os }} -a ${{ arch }} --sc -p:DebugSymbols=false -p:DebugType=None
+        dotnet publish -c Release -os ${{ inputs.os }} -a ${{ inputs.arch }} --sc -p:DebugSymbols=false -p:DebugType=None
         
 #        echo "::set-output name=artifactsPath::$()"
   
@@ -34,5 +34,5 @@ runs:
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2
       with:
-        name: ${{ matrix.os }}-${{ matrix.arch }}
-        path: ./src/GreenCobra.Client/bin/Release/net6.0/${{ os }}-${{ arch }}/publish/
+        name: ${{ inputs.os }}-${{ inputs.arch }}
+        path: ./src/GreenCobra.Client/bin/Release/net6.0/${{ inputs.os }}-${{ inputs.arch }}/publish/

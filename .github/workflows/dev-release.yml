@@ -12,21 +12,39 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        os: [win, linux, osx]
+        arch: [arm64, x64]
+        #include: 
+        #  - os: linux
+        #    arch: x86
+    
     steps:
-      - uses: actions/checkout@v2
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v1
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Call composite Action build single file
+        uses: ./.github/actions/build-dot-net-single-file
         with:
-          dotnet-version: 6.0.x
-      - name: Restore dependencies
-        run: dotnet restore
-      - name: Build
-        run: dotnet build --no-restore
-      - name: Publish
-        run: |
-          dotnet publish -r win-x64 -c Release --sc -p:DebugSymbols=false -p:DebugType=None
-          dotnet publish -r linux-x64 -c Release --sc -p:DebugSymbols=false -p:DebugType=None
-          dotnet publish -r osx-x64 -c Release --sc -p:DebugSymbols=false -p:DebugType=None
+          os: ${{ matrix.os }}
+          arch: ${{ matrix.arch }}
+
+#    steps:
+#      - uses: actions/checkout@v2
+#      - name: Setup .NET
+#        uses: actions/setup-dotnet@v1
+#        with:
+#          dotnet-version: 6.0.x
+#      - name: Restore dependencies
+#        run: dotnet restore
+#      - name: Build
+#        run: dotnet build --no-restore
+#      - name: Publish
+#        run: |
+#          dotnet publish -r win-x64 -c Release --sc -p:DebugSymbols=false -p:DebugType=None
+#          dotnet publish -r linux-x64 -c Release --sc -p:DebugSymbols=false -p:DebugType=None
+#          dotnet publish -r osx-x64 -c Release --sc -p:DebugSymbols=false -p:DebugType=None
 
       - name: Release
         uses: softprops/action-gh-release@v1

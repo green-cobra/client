@@ -24,6 +24,9 @@ jobs:
       - name: Checkout repo 
       - uses: actions/checkout@v2
       
+      - name: Display structure of artifacts
+        run: ls -R
+      
       - name: Call composite Action build single file
       - uses: ./github/actions/build-dot-net-single-file
         with: 

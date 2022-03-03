@@ -17,10 +17,11 @@ runs:
         dotnet-version: '6.0.x'
         
     - name: Restore Dependencies
+      shell: bash
       run: dotnet restore
   
     - name: Build & Publish
-      id: build-and-publish
+      shell: bash
       run: |
         dotnet build -c Release --no-restore
         dotnet publish -c Release -os ${{ os }} -a ${{ arch }} --sc -p:DebugSymbols=false -p:DebugType=None

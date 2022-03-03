@@ -16,9 +16,9 @@ jobs:
       matrix: 
         os: [win, linux, osx]
         arch: [arm64, x64]
-        include: 
-          - os: linux
-            arch: x86
+        #include: 
+        #  - os: linux
+        #    arch: x86
         
     steps:
       - name: Checkout repo 

@@ -1,4 +1,4 @@
-name: dev-release
+name: docker-release
 
 permissions:
   contents: write

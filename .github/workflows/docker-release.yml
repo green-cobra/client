@@ -5,7 +5,12 @@ permissions:
 
 on:
   workflow_dispatch:
-        
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+      
 jobs:
   push-docker-image:
     

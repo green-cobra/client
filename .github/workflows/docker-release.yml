@@ -23,7 +23,7 @@ jobs:
           arch: x64
 
       - name: Login to the Container registry
-        uses: docker/login@v1
+        uses: docker/login@f054a8b539a109f9f41c372932f1ae047eff08c9
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -36,7 +36,7 @@ jobs:
           images: ghcr.io/${{ github.repository }}
 
       - name: Build and push docker image
-        uses: docker/build-and-push-action@v2
+        uses: docker/build-and-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
           context: .
           push: true

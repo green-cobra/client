@@ -7,6 +7,6 @@ public record ProxyServerConfigurationConstructedState(
 {
     public string Format() =>
         $"Received Domain    : {ServerConfiguration.Domain}\r\n" +
-        $"Application URL    : {ServerConfiguration.ServerHost}\r\n" +
+        $"Application URL    : {ServerConfiguration.ServerUrl}\r\n" +
         $"Server end point   : {ServerConfiguration.ServerEndPoint}";
 }

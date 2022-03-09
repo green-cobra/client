@@ -14,7 +14,8 @@ commandParams = new[]
 {
     "proxy",
     "--server-domain-request","green-cobra-7578",
-    "--local-port","57679"
+    "--local-port","57679",
+    "--server-url", "http://localhost:271/api/v1/tunnel" // configured via docker
 };
 Console.WriteLine("Debug Input: " + commandParams.Aggregate((s, s1) => $"{s} {s1}"));
 #else
@@ -27,7 +28,7 @@ var cmdBuilder = new CommandLineBuilder(bootstrap);
 cmdBuilder.AddMiddleware(async (context, next) =>
 {
     context.BindingContext.AddService(provider => new LoggerAdapter(provider.GetService<IConsole>()));
-    context.BindingContext.AddService(provider => new LocalTunnelProxyService(provider.GetService<LoggerAdapter>()));
+    context.BindingContext.AddService(provider => new GreenCobraProxyServer(provider.GetService<LoggerAdapter>()));
     context.BindingContext.AddService(provider => new ProxyService(provider.GetService<LoggerAdapter>()));
 
     await next(context);

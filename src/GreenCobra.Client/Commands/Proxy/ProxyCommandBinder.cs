@@ -4,6 +4,7 @@ using GreenCobra.Client.Helpers;
 using GreenCobra.Client.Logging;
 using GreenCobra.Client.Logging.States;
 using GreenCobra.Client.Services.ServerCommunication;
+using GreenCobra.Client.Services.ServerCommunication.Models;
 using GreenCobra.Proxy;
 
 namespace GreenCobra.Client.Commands.Proxy;
@@ -14,13 +15,16 @@ public class ProxyCommandBinder : BinderBase<ProxyConfiguration>
     {
         var cancellationToken = context.GetService<CancellationToken>();
         var logger = context.GetService<LoggerAdapter>();
-        var ltServer = context.GetService<LocalTunnelProxyService>();
+        var proxyServer = context.GetService<GreenCobraProxyServer>();
 
         var localEndPoint = BindLocalEndPoint(context);
         
-        var configurationUrl = BindConfigurationUrl(context);
-        var (serverEndPoint, maxConnections) = ltServer
-            .GetProxyConfigurationAsync(configurationUrl, cancellationToken)
+        var serverUrlUrl = BindServerUrl(context);
+        var domainRequest = BindDomainRequest(context);
+        var proxyRequest = new ProxyConfigurationRequest(serverUrlUrl, domainRequest); 
+        
+        var (serverEndPoint, maxConnections) = proxyServer
+            .GetProxyConfigurationAsync(proxyRequest, cancellationToken)
             .GetAwaiter().GetResult();
         
         var proxyConfig = new ProxyConfiguration(serverEndPoint!, localEndPoint, maxConnections);
@@ -37,10 +41,6 @@ public class ProxyCommandBinder : BinderBase<ProxyConfiguration>
         return IPEndPoint.Parse($"{localHost}:{localPort}");
     }
 
-    private static Uri BindConfigurationUrl(BindingContext context)
-    {
-        var serverUrl = context.GetOption(ProxySymbolsStorage.ServerUrlOption);
-        var serverDomainRequest = context.GetOption(ProxySymbolsStorage.ServerDomainRequestOption);
-        return new Uri(serverUrl, serverDomainRequest);
-    }
+    private static Uri BindServerUrl(BindingContext context) => context.GetOption(ProxySymbolsStorage.ServerUrlOption);
+    private static string BindDomainRequest(BindingContext context) => context.GetOption(ProxySymbolsStorage.ServerDomainRequestOption);
 }

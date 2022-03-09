@@ -8,8 +8,7 @@ public class ConfigurationDefaultService
     private const string ConfigFolderName = "green-cobra";
     private const string ConfigFileName = "config.json";
 
-    private static readonly ProxyCommandOptions ProxyDefaults =
-        new("127.0.0.1", 80, new Uri("https://localtunnel.me/"), "?new");
+    private static readonly ProxyCommandOptions ProxyDefaults = new("127.0.0.1", 80, new Uri("https://localtunnel.me/"), "?new");
 
     private readonly string _configurationFolderPath;
     private readonly string _configurationFilePath;

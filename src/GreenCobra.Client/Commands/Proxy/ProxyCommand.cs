@@ -14,11 +14,13 @@ public class ProxyCommand : Command
     public ProxyCommand() :base(Name, Description)
     {
         this.RegisterOptions();
-        this.SetHandler(async (ProxyConnectionOptions proxyConnectionOptions, InvocationContext ctx, CancellationToken cancellationToken) =>
-            {
-                // wait until app will not be closed
-                var proxyService = ctx.BindingContext.GetService<ProxyService>();
-                await proxyService.StartProxyAsync(proxyConnectionOptions, cancellationToken);
-            }, new ProxyOptionBinder());
+        this.SetHandler<ProxyConfiguration, InvocationContext, CancellationToken>(ProxyHandler, new ProxyCommandBinder());
+    }
+
+    private async Task ProxyHandler(ProxyConfiguration proxyConfig, InvocationContext ctx, CancellationToken cancellationToken)
+    {
+        // wait until app will not be closed
+        var proxyService = ctx.BindingContext.GetService<ProxyService>();
+        await proxyService.StartProxyAsync(proxyConfig, cancellationToken);
     }
 }

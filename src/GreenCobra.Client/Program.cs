@@ -13,7 +13,7 @@ string[] commandParams;
 commandParams = new[]
 {
     "proxy",
-    "--server-domain-request","green-cobra-7576",
+    "--server-domain-request","green-cobra-7578",
     "--local-port","57679"
 };
 Console.WriteLine("Debug Input: " + commandParams.Aggregate((s, s1) => $"{s} {s1}"));
@@ -22,12 +22,12 @@ commandParams = args;
 #endif
 
 var bootstrap = new GreenCobraRootCommand();
-
 var cmdBuilder = new CommandLineBuilder(bootstrap);
+
 cmdBuilder.AddMiddleware(async (context, next) =>
 {
     context.BindingContext.AddService(provider => new LoggerAdapter(provider.GetService<IConsole>()));
-    context.BindingContext.AddService(provider => new ServerCommunicationService(provider.GetService<LoggerAdapter>()));
+    context.BindingContext.AddService(provider => new LocalTunnelProxyService(provider.GetService<LoggerAdapter>()));
     context.BindingContext.AddService(provider => new ProxyService(provider.GetService<LoggerAdapter>()));
 
     await next(context);

@@ -10,4 +10,11 @@ public static class Guard
         if (valueToCheck is null)
             throw new ArgumentNullException(message);
     }
+
+    public static void Satisfy(bool condition, 
+        [CallerArgumentExpression("condition")] string message = "")
+    {
+        if (!condition)
+            throw new ArgumentOutOfRangeException(message);
+    }
 }

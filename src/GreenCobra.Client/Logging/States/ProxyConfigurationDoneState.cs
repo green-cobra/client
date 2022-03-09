@@ -2,7 +2,7 @@
 
 namespace GreenCobra.Client.Logging.States;
 
-public record ProxyConnectionOptionConstructedState(ProxyConnectionOptions ConnectionOptions)
+public record ProxyConnectionOptionConstructedState(ProxyConfiguration ConnectionOptions)
     : ILoggerState
 {
     public string Format () =>

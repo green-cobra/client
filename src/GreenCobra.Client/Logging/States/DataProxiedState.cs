@@ -4,7 +4,7 @@ using GreenCobra.Proxy;
 namespace GreenCobra.Client.Logging.States;
 
 public record TaskProxiedDataState(
-        ProxyConnectionOptions ConnectionOptions, 
+        ProxyConfiguration ConnectionOptions, 
         ProxyResult ProxyResult)
     : ILoggerState
 {

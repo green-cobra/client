@@ -19,7 +19,7 @@ public class ProxyService
         _logger = logger;
     }
 
-    public async Task StartProxyAsync(ProxyConnectionOptions connectionOptions, CancellationToken cancellationToken)
+    public async Task StartProxyAsync(ProxyConfiguration connectionOptions, CancellationToken cancellationToken)
     {
         // todo: start watcher here
         _proxyConnection = new ProxyConnection(connectionOptions.LocalEndPoint, connectionOptions.ServerEndPoint);
@@ -52,7 +52,7 @@ public class ProxyService
         // todo: await watcher task here
     }
 
-    private List<Task<ProxyResult>> SpawnTasks(ProxyConnectionOptions connectionOptions, CancellationToken cancellationToken)
+    private List<Task<ProxyResult>> SpawnTasks(ProxyConfiguration connectionOptions, CancellationToken cancellationToken)
     {
         Debug.Assert(_proxyConnection is not null);
 

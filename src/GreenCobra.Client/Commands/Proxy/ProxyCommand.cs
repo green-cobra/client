@@ -6,21 +6,19 @@ using GreenCobra.Proxy;
 
 namespace GreenCobra.Client.Commands.Proxy;
 
-public class ProxyCommand : Command
+public partial class ProxyCommand : Command
 {
-    private new const string Name = "proxy";
-    private new const string Description = "Proxy requests from public server to your locally running application";
-
-    public ProxyCommand() :base(Name, Description)
+    public ProxyCommand() :base(Resources.ProxyCommand_Name, Resources.ProxyCommand_Description)
     {
-        this.RegisterOptions();
+        InitializeSymbols();
+        
         this.SetHandler<ProxyConfiguration, InvocationContext, CancellationToken>(ProxyHandler, new ProxyCommandBinder());
     }
 
     private async Task ProxyHandler(ProxyConfiguration proxyConfig, InvocationContext ctx, CancellationToken cancellationToken)
     {
-        // wait until app will not be closed
         var proxyService = ctx.BindingContext.GetService<ProxyService>();
+        
         await proxyService.StartProxyAsync(proxyConfig, cancellationToken);
     }
 }

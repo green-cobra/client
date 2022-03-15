@@ -1,8 +1,8 @@
-using System.Collections.Specialized;
 using System.Net;
 using System.Net.Http.Json;
 using System.Net.Sockets;
 using System.Text.Json;
+using GreenCobra.Client.Helpers;
 using GreenCobra.Client.Logging;
 using GreenCobra.Client.Logging.States;
 using GreenCobra.Client.Services.ServerCommunication.Models;
@@ -12,12 +12,16 @@ namespace GreenCobra.Client.Services.ServerCommunication;
 
 public class GreenCobraProxyServer
 {
-    private readonly LoggerAdapter _logger;
-    public GreenCobraProxyServer(LoggerAdapter logger)
-    {
-        Guard.AgainstNull(logger);
-        _logger = logger;
-    }
+    //private readonly LoggerAdapter _logger;
+    // public GreenCobraProxyServer(LoggerAdapter logger)
+    // {
+    //     Guard.AgainstNull(logger);
+    //     _logger = logger;
+    // }
+
+    public ProxyConfigurationResponse GetProxyConfiguration(ProxyConfigurationRequest request,
+        CancellationToken cancellationToken) =>
+        GetProxyConfigurationAsync(request, cancellationToken).GetAwaiter().GetResult();
     
     public async Task<ProxyConfigurationResponse> GetProxyConfigurationAsync(ProxyConfigurationRequest request, CancellationToken cancellationToken)
     {
@@ -28,10 +32,10 @@ public class GreenCobraProxyServer
         var response = await httpClient.PostAsync(request.ServerUrl, content, cancellationToken);
         var config = await ParseAndValidateResponseAsync(response, cancellationToken);
 
-        var serverEndPoint = await ResolveProxyServerEndPointAsync(config, cancellationToken); 
-        config = config with {ServerEndPoint = serverEndPoint};
+        var serverAddress = await DnsNameResolver.GetIpAddressAsync(config.ServerUrl.DnsSafeHost, cancellationToken);
+        config = config with {ServerEndPoint = new IPEndPoint(serverAddress, config.ServerPort)};
         
-        _logger.Log(new ProxyServerConfigurationConstructedState(config));
+        //_logger.Log(new ProxyServerConfigurationConstructedState(config));
 
         return config;
     }
@@ -48,17 +52,5 @@ public class GreenCobraProxyServer
         Guard.AgainstNull(serverConfig.Domain);
 
         return serverConfig;
-    }
-
-    private static async Task<EndPoint?> ResolveProxyServerEndPointAsync(ProxyConfigurationResponse serverConfig, CancellationToken cancellationToken)
-    {
-        // todo: hardcoded to work with localhost
-        if (serverConfig.ServerUrl.ToString().Contains("localhost"))
-            return new IPEndPoint(IPAddress.Parse("127.0.0.1"), serverConfig.ServerPort); 
-        
-        var safeHost = serverConfig.ServerUrl.DnsSafeHost;
-        var ipAddresses = await Dns.GetHostAddressesAsync(safeHost, AddressFamily.InterNetwork, cancellationToken);
-
-        return new IPEndPoint(ipAddresses.First(), serverConfig.ServerPort);
     }
 }

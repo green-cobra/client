@@ -11,6 +11,14 @@ public static class Guard
             throw new ArgumentNullException(message);
     }
 
+    public static void AgainstNullOrEmpty(string valueToCheck,
+        [CallerArgumentExpression("valueToCheck")]
+        string message = "")
+    {
+        if (string.IsNullOrEmpty(valueToCheck))
+            throw new ArgumentOutOfRangeException(message);
+    }
+    
     public static void Satisfy(bool condition, 
         [CallerArgumentExpression("condition")] string message = "")
     {

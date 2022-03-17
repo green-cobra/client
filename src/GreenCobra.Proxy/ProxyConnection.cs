@@ -8,13 +8,13 @@ public class ProxyConnection
     private readonly EndPoint _clientEndPoint;
     private readonly EndPoint _serverEndPoint;
 
-    public ProxyConnection(EndPoint clientEndPoint, EndPoint serverEndPoint)
+    public ProxyConnection(EndPoint from, EndPoint to)
     {
-        Guard.AgainstNull(serverEndPoint);
-        Guard.AgainstNull(clientEndPoint);
+        Guard.AgainstNull(to);
+        Guard.AgainstNull(from);
 
-        _clientEndPoint = clientEndPoint;
-        _serverEndPoint = serverEndPoint;
+        _clientEndPoint = from;
+        _serverEndPoint = to;
     }
 
     public async Task<ProxyResult> ProxyAsync(CancellationToken cancellationToken)

@@ -1,6 +1,6 @@
 ﻿using System.CommandLine;
+using GreenCobra.Client.Commands.Proxy.Models;
 using GreenCobra.Client.Services.Configuration;
-using GreenCobra.Client.Services.Configuration.Models;
 
 namespace GreenCobra.Client.Commands.Proxy;
 
@@ -14,12 +14,12 @@ public partial class ProxyCommand
     private void InitializeSymbols()
     {
         var configuration = new ConfigurationDefaultService();
-        var defaults = configuration.GetProxyDefaults();
+        var defaults = configuration.ReadConfigurationFile();
         
         InitializeOptions(defaults);
     }
 
-    private void InitializeOptions(ProxyCommandOptions defaults)
+    private void InitializeOptions(ProxyCommandInput defaults)
     {
         LocalHostOrAddressOption = new Option<string>(
             new[]
@@ -27,7 +27,7 @@ public partial class ProxyCommand
                 Resources.Option.LocalHostOrAddress_ShortName,
                 Resources.Option.LocalHostOrAddress_LongName
             },
-            () => defaults.LocalHost,
+            () => defaults.LocalHostOrAddress,
             Resources.Option.LocalHostOrAddress_Description);
 
         LocalPortOption = new Option<int>(
@@ -54,7 +54,7 @@ public partial class ProxyCommand
                 Resources.Option.DesiredDomain_ShortName,
                 Resources.Option.DesiredDomain_LongName
             },
-            () => defaults.ServerDomainRequest,
+            () => defaults.DesiredDomain,
             Resources.Option.DesiredDomain_Description);
         
         AddOption(LocalHostOrAddressOption);

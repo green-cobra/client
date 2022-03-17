@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
-using GreenCobra.Client.Services.Configuration.Models;
+using GreenCobra.Client.Commands.Proxy.Models;
+using GreenCobra.Client.Helpers;
 
 namespace GreenCobra.Client.Services.Configuration;
 
@@ -7,8 +8,6 @@ public class ConfigurationDefaultService
 {
     private const string ConfigFolderName = "green-cobra";
     private const string ConfigFileName = "config.json";
-
-    private static readonly ProxyCommandOptions ProxyDefaults = new("127.0.0.1", 80, new Uri("https://localtunnel.me/"), "?new");
 
     private readonly string _configurationFolderPath;
     private readonly string _configurationFilePath;
@@ -37,29 +36,38 @@ public class ConfigurationDefaultService
         _configurationFilePath = Path.Combine(_configurationFolderPath, ConfigFileName);
     }
 
-    public ProxyCommandOptions GetProxyDefaults() => CreateDefaultConfig() ? ProxyDefaults : ReadFromConfigFile();
+    public ProxyCommandInput ReadConfigurationFile() => CreateDefaultConfig() 
+        ? ProxyCommandInput.Defaults : ReadFromConfigFile();
 
-    private ProxyCommandOptions ReadFromConfigFile()
+    private ProxyCommandInput ReadFromConfigFile()
     {
         var configString = File.ReadAllText(_configurationFilePath);
-        return JsonSerializer.Deserialize<ProxyCommandOptions>(configString)!;
+        var config = JsonSerializer.Deserialize<ProxyCommandInput>(configString)!;
+
+        BuildTimeLogger.LogInformation(Resources.Logs.DefaultConfig_Loaded, config);
+        
+        return config;
     }
 
     private bool CreateDefaultConfig()
     {
         if (File.Exists(_configurationFilePath))
             return false;
+        
+        BuildTimeLogger.LogInformation(Resources.Logs.DefaultConfig_FileCreation, ProxyCommandInput.Defaults);
 
         if (!Directory.Exists(_configurationFolderPath))
             Directory.CreateDirectory(_configurationFolderPath);
 
-        var jsonConfigs = JsonSerializer.Serialize(ProxyDefaults, new JsonSerializerOptions { WriteIndented = true });
+        var jsonConfigs = JsonSerializer.Serialize(ProxyCommandInput.Defaults, new JsonSerializerOptions { WriteIndented = true });
         using var sw = new StreamWriter(_configurationFilePath, new FileStreamOptions
         {
             Mode = FileMode.CreateNew,
             Access = FileAccess.Write,
         });
         sw.Write(jsonConfigs);
+        
+        BuildTimeLogger.LogInformation(Resources.Logs.DefaultConfig_FileCreationDone, _configurationFilePath);
         
         return true;
     }

@@ -16,10 +16,15 @@ string[] commandParams;
 commandParams = new[]
 {
     "proxy",
-    //"--local-host", "chat.rit",
-    "--domain","green-cobra",
-    "--local-port","57679",
-    "--server-url", "http://localhost:3001/api/v1/tunnel" // configured via docker
+    // "--domain","green-cobra",
+    // "--local-port","57679",
+    // "--server-url", "http://localhost:3001/api/v1/tunnel" // configured via docker
+    
+    
+    "-d", "chat",
+    "-h", "chat.rit",
+    "-p", "443",
+    "-s", "http://lox.com:3001/api/v1/tunnel"
 };
 BuildTimeLogger.LogDebug("Debug Input: " + commandParams.Aggregate((s, s1) => $"{s} {s1}"));
 #else

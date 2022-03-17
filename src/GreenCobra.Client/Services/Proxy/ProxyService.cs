@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Text;
 using GreenCobra.Common;
 using GreenCobra.Proxy;
 using Microsoft.Extensions.Logging;
@@ -24,10 +25,11 @@ public class ProxyService
         _logger.LogDebug(Resources.Logs.ProxyConnectionSetupDone, from, to);
       
         var proxyPool = SpawnTasks(proxyConnection, parallelDegree, cancellationToken);
+        
+        _logger.LogDebug(Resources.Logs.ProxyParallelConnectionStarted, parallelDegree);
+        
         while (!cancellationToken.IsCancellationRequested)
         {
-            _logger.LogDebug(Resources.Logs.ProxyParallelConnectionStarted, parallelDegree);
-            
             var completedTask = await Task.WhenAny(proxyPool);
 
             _logger.LogDebug(Resources.Logs.ProxyTaskCompleted, completedTask.Status);
@@ -37,10 +39,28 @@ public class ProxyService
                 case {Status: TaskStatus.RanToCompletion}:
                     var proxyResult = await completedTask;
 
-                    // string ByteToString(byte[] bytes)
-                        // => Encoding.UTF8.GetString(bytes);
-                    // todo: add logging
+                     string ByteToString(byte[] bytes)
+                        => Encoding.UTF8.GetString(bytes);
 
+                    if (proxyResult.RequestHeading is not null && proxyResult.ResponseHeading is not null)
+                    {
+                        _logger.LogInformation($"Proxied:\r\n " +
+                                               $"Request:{ByteToString(proxyResult.RequestHeading)}\r\n" +
+                                               $"Response: {ByteToString(proxyResult.ResponseHeading)}\r\n");
+                    }
+                    else if (proxyResult.RequestHeading is not null)
+                    {
+                        _logger.LogInformation($"Proxied:\r\n " +
+                                               $"Request:{ByteToString(proxyResult.RequestHeading)}\r\n" +
+                                               $"Response EMPTY");
+                    }
+                    else
+                    {
+                        _logger.LogWarning("No data proxied");    
+                    }
+                    
+                    // todo: add logging
+                    
                     break;
                 case {Status: TaskStatus.Canceled}:
                 case {Status: TaskStatus.Faulted}:

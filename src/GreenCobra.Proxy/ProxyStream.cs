@@ -1,6 +1,8 @@
 ﻿using System.Buffers;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading.Channels;
 using GreenCobra.Common;
 
 namespace GreenCobra.Proxy;
@@ -34,6 +36,26 @@ public class ProxyStream : IDisposable
             while ((bytesRead = await ReadAsync(buffer, cancellationToken)) != 0)
             {
                 var valuableBytes = buffer[..bytesRead];
+
+                void CrackHttps(byte[] bytes)
+                {
+                    Console.WriteLine("Bytes:");
+                    foreach (var b in bytes)
+                    {
+                        Console.Write(b);   
+                    }
+                    Console.WriteLine("");
+                    Console.WriteLine("----------------");
+
+                    // var headers = flatHeaders
+                    //     .Split("\r\n")
+                    //     .Select(x => x.Split(':', 2))
+                    //     .ToDictionary(
+                    //         strings => strings.Length < 2 ? methodKeyName : strings[0],
+                    //         strings => strings.Length < 2 ? strings[0] : strings[1]);
+                }
+
+
                 await destination.WriteAsync(valuableBytes, cancellationToken);
 
                 messageHeading ??= valuableBytes;

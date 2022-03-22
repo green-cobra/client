@@ -1,4 +1,6 @@
-﻿using System.CommandLine;
+﻿#if !DEBUG
+using System.CommandLine;
+#endif
 using System.CommandLine.Builder;
 using System.CommandLine.Invocation;
 using System.CommandLine.IO;

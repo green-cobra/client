@@ -11,7 +11,7 @@ public static class DependencyInjectionExtensions
         var service = ctx.GetService(typeof(T));
         Guard.AgainstNull(service);
 
-        return (T) service!;
+        return (T) service;
     }
 
     public static T GetService<T>(this IServiceProvider sp)
@@ -19,7 +19,7 @@ public static class DependencyInjectionExtensions
         var service = sp.GetService(typeof(T));
         Guard.AgainstNull(service);
 
-        return (T) service!;
+        return (T) service;
     }
     
     public static T GetOption<T>(this BindingContext context, Option<T> option) =>

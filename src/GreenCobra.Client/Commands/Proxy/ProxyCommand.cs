@@ -32,10 +32,10 @@ public partial class ProxyCommand : Command
             await proxyServer.SetupProxyPointAsync(new ProxyPointSetupRequest(input.ServerUrl, input.DesiredDomain),
                 cancellationToken);
         
-        logger.LogInformation(Resources.Logs.ProxyPointSetupDone, proxyPoint.DistributedDomain, proxyPoint.ParallelConnections, proxyPoint.ProxyPoinHost, proxyPoint.ProxyPointPort);
+        logger.LogInformation(Resources.Logs.ProxyPointSetupDone, proxyPoint.DistributedDomain, proxyPoint.ParallelConnections, proxyPoint.ProxyPointHost, proxyPoint.ProxyPointPort);
 
         var localEndPointTask = DnsNameResolver.GetIpAddressAsync(input.LocalHostOrAddress, logger, cancellationToken);
-        var proxyPointEndPointTask = DnsNameResolver.GetIpAddressAsync(proxyPoint.ProxyPoinHost.DnsSafeHost, logger, cancellationToken);
+        var proxyPointEndPointTask = DnsNameResolver.GetIpAddressAsync(proxyPoint.ProxyPointHost.DnsSafeHost, logger, cancellationToken);
         await TaskExt.WhenAll(localEndPointTask, proxyPointEndPointTask);
         var localAddress = await localEndPointTask;
         var proxyPointAddress = await proxyPointEndPointTask;

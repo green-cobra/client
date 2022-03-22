@@ -33,7 +33,7 @@ public class GreenCobraProxyServer
             _logger.LogDebug(Resources.Traces.SetupProxyPoint_ParsedServerResponse, proxyPoint);
         
             Guard.AgainstNull(proxyPoint);
-            return proxyPoint!;
+            return proxyPoint;
         }
         catch (Exception ex)
         {
